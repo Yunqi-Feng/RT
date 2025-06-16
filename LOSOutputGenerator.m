@@ -1,4 +1,4 @@
-function [isLOS, delayLOS, output, varargout] = LOSOutputGenerator(CADoutput, Rx, Tx,...
+function [isLOS, delayLOS, output, varargout] = LOSOutputGenerator(CADoutput,CADop_diffr, Rx, Tx,...
     output, velocityTx, velocityRx, frequency, IndoorSwitch,enablePhase,antenna, ...
     Ptx,polarization,Jones,varargin)
 % This part of code compute LOS between two nodes
@@ -143,6 +143,15 @@ isLOS = verifyPath(Tx, Rx, doaNoRot, [0,0,0],...
         end
         if output1(1,22)<-120
             output1(1,22)=NaN;
+        end
+        [diffraction_loss, diffraction_points] = calculate_diffraction_on_path(Tx, Rx, CADop_diffr, lambda);
+
+    % Add diffraction loss to the path gain
+        output1(1,9) = output1(1,9) - diffraction_loss;
+
+    % Store diffraction points for visualization (optional)
+        if ~isempty(diffraction_points)
+            varargout{1} = diffraction_points;
         end
     else
         %warning('No direct path exists, adding OBS path with PL 150 dB');
