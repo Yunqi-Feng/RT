@@ -14,7 +14,7 @@ function wedges = get_wedge_information(valid_edges, CADop)
 %                .mat_idx1, .mat_idx2: The material library indices for each plane.
 
     % Initialize the output structure
-    wedges = struct('edge_v1', {}, 'edge_v2', {}, 'plane1', {}, 'plane2', {}, 'mat_idx1', {}, 'mat_idx2', {});
+    wedges = struct('edge_v1', {}, 'edge_v2', {}, 'plane1', {}, 'plane2', {}, 'mat_idx1', {}, 'mat_idx2', {}, 'n', {});
     
     % Use a tolerance for comparing floating-point vertex coordinates
     tolerance = 1e-5;
@@ -49,12 +49,26 @@ function wedges = get_wedge_information(valid_edges, CADop)
             new_wedge.edge_v1 = current_edge_v1;
             new_wedge.edge_v2 = current_edge_v2;
             
+
+            plane1_eq = CADop(idx1, 10:13);
+            plane2_eq = CADop(idx2, 10:13);
+
+
             new_wedge.plane1 = CADop(idx1, 10:13);
             new_wedge.plane2 = CADop(idx2, 10:13);
             
             new_wedge.mat_idx1 = CADop(idx1, 14);
             new_wedge.mat_idx2 = CADop(idx2, 14);
             
+
+            % Calculate wedge angle
+            normal1 = plane1_eq(1:3);
+            normal2 = plane2_eq(1:3);
+            wedge_angle = acos(dot(normal1, normal2));
+            
+            % Calculate wedge parameter 'n'
+            new_wedge.n = (2*pi - wedge_angle) / pi;
+
             wedges(end+1) = new_wedge;
         else
             % This case might occur for edges on the boundary of an object
@@ -63,5 +77,5 @@ function wedges = get_wedge_information(valid_edges, CADop)
         end
     end
     
-    fprintf('Found wedge information for %d valid edges.\n', length(wedges));
+    %fprintf('Found wedge information for %d valid edges.\n', length(wedges));
 end

@@ -1,7 +1,17 @@
-function [output, multipath] = diffractionPathGenerator(Tx, Rx, edges, CADOutput, vtx, vrx, frequency, ...
-    LOS_output,pseudo_LOS_output,polarization,Jones,Ptx,antenna,enablePhase)
+function [output, multipath, tmp_plane, plane_mat] = diffractionPathGenerator(Tx, Rx, wedges, CADOutput, ...
+vtx, vrx, frequency,LOS_output,pseudo_LOS_output,polarization,Jones,Ptx, antenna, enablePhase,...
+materialLibrary, mat_confg, IndoorSwitch, tmp_plane, plane_mat)
+
+% function [output, multipath] = diffractionPathGenerator(Tx, Rx, wedges, CADOutput, vtx, vrx, frequency, ...
+%     LOS_output,pseudo_LOS_output,polarization,Jones,Ptx,antenna,enablePhase, ...
+%     materialLibrary, mat_confg, IndoorSwitch, tmp_plane, plane_mat)
 % diffractionPathGenerator: Finds, validates, and computes NLOS single-diffraction paths.
-%
+% [output, multipath, tmp_plane, plane_mat] = diffractionPathGenerator(Tx, Rx, wedges, CADOutput, vtx, vrx, ...
+%    frequency, polarization, Ptx, antenna, enablePhase, materialLibrary, mat_confg, IndoorSwitch, tmp_plane, plane_mat)
+
+
+
+
 % Inputs:
 %   Tx, Rx:      Transmitter and receiver positions.
 %   edges:       List of all edges in the environment from generate_edges.m.
@@ -31,12 +41,12 @@ function [output, multipath] = diffractionPathGenerator(Tx, Rx, edges, CADOutput
     %Ptx = p.Results.Ptx;
     %Jones = p.Results.Jones;
     %antenna = p.Results.antenna;
-    %enablePhase = p.Results.enablePhase;
-    
+    %enablePhase = p.Results.enablePhase
     output = [];
     multipath = [];
     c = 3e8;
     wavelength = c / frequency;
+    k = 2 * pi / wavelength;
     if ~isempty(LOS_output)% with the LOS path
         LOS_TOA=LOS_output(8);
         LOS_P=LOS_output(9);
@@ -57,10 +67,74 @@ function [output, multipath] = diffractionPathGenerator(Tx, Rx, edges, CADOutput
         pseudo_LOS_PHA=pseudo_LOS_output(18);
         pseudo_LOS_DOP=pseudo_LOS_output(20);
     end
-    for i = 1:size(edges, 1)
-        edge_start = edges(i, 1:3);
-        edge_end = edges(i, 4:6);
-        
+    for i = 1:size(wedges, 1)
+        %edge_start = edges(i, 1:3);
+        %edge_end = edges(i, 4:6);
+        wedge = wedges(i);
+        edge_start = wedge.edge_v1;
+        edge_end = wedge.edge_v2;
+
+        % Material for the first face of the wedge
+        if wedge.mat_idx1 == 7 % It's a scatterer
+            if ~isempty(tmp_plane)
+                [is_known, idx] = ismember(wedge.plane1, tmp_plane, 'rows');
+            else
+                is_known = false;
+            end
+            if ~is_known
+                % New scatterer plane, assign a random material
+                index = [8,9,10,11,12,13,14,18];
+                scatterer_index = index(randperm(numel(index),1));
+                
+                % Update the material library for this instance
+                materialLibrary.permittivity(7) = materialLibrary.permittivity(scatterer_index);
+                materialLibrary.conductivity(7) = materialLibrary.conductivity(scatterer_index);
+                materialLibrary.roughness(7) = materialLibrary.roughness(scatterer_index);
+                
+                % Update the lookup tables
+                tmp_plane = [tmp_plane; wedge.plane1];
+                plane_mat = [plane_mat; materialLibrary.permittivity(7), ...
+                             materialLibrary.conductivity(7), materialLibrary.roughness(7)];
+            else
+                % Known scatterer plane, retrieve its properties
+                materialLibrary.permittivity(7) = plane_mat(idx, 1);
+                materialLibrary.conductivity(7) = plane_mat(idx, 2);
+                materialLibrary.roughness(7) = plane_mat(idx, 3);
+            end
+        end
+        wedge_face1.mat_idx = wedge.mat_idx1;
+
+        % Material for the second face of the wedge
+        if wedge.mat_idx2 == 7 % It's a scatterer
+            if ~isempty(tmp_plane)
+                [is_known, idx] = ismember(wedge.plane1, tmp_plane, 'rows');
+            else
+                is_known = false;
+            end
+            if ~is_known
+                index = [8,9,10,11,12,13,14,18];
+                scatterer_index = index(randperm(numel(index),1));
+                
+                materialLibrary.permittivity(7) = materialLibrary.permittivity(scatterer_index);
+                materialLibrary.conductivity(7) = materialLibrary.conductivity(scatterer_index);
+                materialLibrary.roughness(7) = materialLibrary.roughness(scatterer_index);
+                
+                tmp_plane = [tmp_plane; wedge.plane2];
+                plane_mat = [plane_mat; materialLibrary.permittivity(7), ...
+                             materialLibrary.conductivity(7), materialLibrary.roughness(7)];
+            else
+                materialLibrary.permittivity(7) = plane_mat(idx, 1);
+                materialLibrary.conductivity(7) = plane_mat(idx, 2);
+                materialLibrary.roughness(7) = plane_mat(idx, 3);
+            end
+        end
+        wedge_face2.mat_idx = wedge.mat_idx2;
+
+
+
+
+        edge_vector = edge_end - edge_start;
+        edge_length = norm(edge_vector);
         % --- Diffraction Point Calculation ---
         % A more accurate method than midpoint is finding the point on the edge that
         % minimizes the path length Tx-edge-Rx. This is the point of stationary phase.
@@ -68,7 +142,13 @@ function [output, multipath] = diffractionPathGenerator(Tx, Rx, edges, CADOutput
         % s = dot(Tx-e1, e2-e1)/norm(e2-e1)^2 + dot(Rx-e1, e2-e1)/norm(e2-e1)^2, then divided by 2
         % For simplicity, we can still use the midpoint, or a more advanced method.
         % Let's stick with the midpoint for this implementation's clarity.
-        diffraction_point = (edge_start + edge_end) / 2;
+        %diffraction_point = (edge_start + edge_end) / 2;
+        t = (dot(Tx - edge_start, edge_vector) + dot(Rx - edge_start, edge_vector)) / (2 * edge_length^2);
+        if t >= 0 && t <= 1
+            diffraction_point = edge_start + t * edge_vector;
+        else
+            continue; % Skip to the next edge if the diffraction point is not on the segment.
+        end
         
         % --- Path Validation ---
         % Check for obstruction from Tx to diffraction point
@@ -85,9 +165,22 @@ function [output, multipath] = diffractionPathGenerator(Tx, Rx, edges, CADOutput
             distance = d1 + d2;
             delayLOS = distance / c;
             
-            % Calculate diffraction loss using KED (assuming grazing incidence, h=0)
-            diffraction_loss_dB = calculate_ked_loss(0, d1, d2, wavelength);
+            % Calculate angles in the edge-fixed plane of incidence
+            [phi, phi_n, L] = calculate_utd_angles(Tx, Rx, diffraction_point, wedge.edge_v1, wedge.edge_v2);
             
+            % Calculate UTD diffraction coefficients
+            [D_s, D_h] = UTD_diffraction_coeff_material(phi, phi_n, wedge.n, L, k,wedge_face1, wedge_face2, materialLibrary, frequency, polarization);
+            
+            % Choose the appropriate coefficient based on polarization
+            if strcmp(polarization, 'V-V') % TE
+                D = D_s;
+            else % TM
+                D = D_h;
+            end
+
+            % Calculate diffraction loss using KED (assuming grazing incidence, h=0)
+            %diffraction_loss_dB = calculate_ked_loss(0, d1, d2, wavelength);
+            diffraction_loss_dB = calculate_utd_loss(d1, d2, D);
             % --- Start Filling the 22-column Output Vector ---
             output1 = nan(1, 22);
             output1(1) = -1; % Use -1 to identify this as a purely diffracted path
@@ -254,4 +347,23 @@ function [output, multipath] = diffractionPathGenerator(Tx, Rx, edges, CADOutput
             multipath = [multipath; [Tx, diffraction_point, Rx]];
         end
     end
+end
+
+function [phi, phi_n, L] = calculate_utd_angles(S, P, Q, E1, E2)
+%CALCULATE_UTD_ANGLES Calculates the angles and distance parameter for UTD.
+% S: Source, P: Observation point, Q: Diffraction point on the edge
+% E1, E2: Vertices of the edge
+    
+    edge_vec = E2 - E1;
+    s_prime = Q - S;
+    s = P - Q;
+    
+    % Project S and P onto the plane normal to the edge at Q
+    s_prime_proj = s_prime - dot(s_prime, edge_vec) / norm(edge_vec)^2 * edge_vec;
+    s_proj = s - dot(s, edge_vec) / norm(edge_vec)^2 * edge_vec;
+
+    phi = atan2(norm(cross(s_proj, s_prime_proj)), dot(s_proj, s_prime_proj));
+    phi_n = acos(dot(s_prime_proj, -s_prime_proj)/(norm(s_prime_proj)*norm(-s_prime_proj)));
+
+    L = (norm(s_prime_proj) * norm(s_proj)) / (norm(s_prime_proj) + norm(s_proj));
 end
