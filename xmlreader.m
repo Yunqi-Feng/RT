@@ -73,44 +73,153 @@ function [CADOutput, materialSwitch,scatterer_confg] = xmlreader(filename, ...
 % December 2023
 s = xml2struct(filename);
 s.amf.metadata.Text='Yunqi Feng';
-if scatterer_num>0
-    for iii=1:1
-        [x_cen,y_cen,z_cen,x_dep,y_dep,z_dep,scatterer_num]=scatterer_config(confg_dim,scatterer_num,...
-        scatterer_dim,scatterer_dis,NodeLocTx,NodeLocRx,IndoorSwitch, ...
-        scatterer_confg,scatterer_height_max);
-        scatterer_num=length(x_cen);
-        s=scatterer_generation(s,confg_dim,scatterer_num,...
-        x_cen,y_cen,z_cen,x_dep,y_dep,z_dep,IndoorSwitch);
-        for i=1:scatterer_num
-            idx=1;
-            while (NodeLocTx(1)>x_cen(i)-0.5*x_dep(i)&&NodeLocTx(1)<x_cen(i)+0.5*x_dep(i)&&...
-                    NodeLocTx(2)>y_cen(i)-0.5*y_dep(i)&&NodeLocTx(2)<y_cen(i)+0.5*y_dep(i)&&...
-                    NodeLocTx(3)>z_cen(i)-0.5*z_dep(i)&&NodeLocTx(3)<z_cen(i)+0.5*z_dep(i))||...
-                    (NodeLocRx(1)>x_cen(i)-0.5*x_dep(i)&&NodeLocRx(1)<x_cen(i)+0.5*x_dep(i)&&...
-                    NodeLocRx(2)>y_cen(i)-0.5*y_dep(i)&&NodeLocRx(2)<y_cen(i)+0.5*y_dep(i)&&...
-                    NodeLocRx(3)>z_cen(i)-0.5*z_dep(i)&&NodeLocRx(3)<z_cen(i)+0.5*z_dep(i))
-                [x_cen,y_cen,z_cen,x_dep,y_dep,z_dep,scatterer_num]=scatterer_config(confg_dim,scatterer_num,...
-            scatterer_dim,scatterer_dis,NodeLocTx,NodeLocRx,IndoorSwitch, ...
-            scatterer_confg,scatterer_height_max);
-                s=scatterer_generation(s,confg_dim,scatterer_num,...
-            x_cen,y_cen,z_cen,x_dep,y_dep,z_dep,IndoorSwitch);
-                idx=idx+1;
-                if idx>10
-                    error('inappropriate configuration, reduce the number or dimension of scatterers')
-                end
-            end 
-        end
-        scatterer_confg_tmp=[x_cen;y_cen;z_cen;x_dep;y_dep;z_dep];
-        if ~isempty(scatterer_confg)
-            scatterer_confg=scatterer_confg;
-        else
-            scatterer_confg=[scatterer_confg scatterer_confg_tmp];
-        end
+if scatterer_num > 0
+    if isempty(scatterer_confg)
+        % Call the new robust placement function
+        [x_cen, y_cen, z_cen, x_dep, y_dep, z_dep] = generate_valid_scatterer_layout(scatterer_num, confg_dim, scatterer_dim, scatterer_dis, NodeLocTx, NodeLocRx, IndoorSwitch, scatterer_confg, scatterer_height_max);
+
+        % Update the final scatterer number (should be the same unless an error was thrown)
+        scatterer_num = length(x_cen);
+        
+        % Generate the geometry for the validated scatterers
+        s = scatterer_generation(s, confg_dim, scatterer_num, x_cen, y_cen, z_cen, x_dep, y_dep, z_dep, IndoorSwitch);
+        
+        % Store the final valid configuration
+        scatterer_confg = [x_cen; y_cen; z_cen; x_dep; y_dep; z_dep];
+    else
+        % Logic to handle pre-configured scatterers remains the same
+        x_cen=scatterer_confg(1,1:scatterer_num);
+        y_cen=scatterer_confg(2,1:scatterer_num);
+        z_cen=scatterer_confg(3,1:scatterer_num);
+        x_dep=scatterer_confg(4,1:scatterer_num);
+        y_dep=scatterer_confg(5,1:scatterer_num);
+        z_dep=scatterer_confg(6,1:scatterer_num);
     end
 else
-    s=scenario_generation(s,confg_dim,IndoorSwitch);
-    scatterer_confg=[];
+    s = scenario_generation(s, confg_dim, IndoorSwitch);
+    scatterer_confg = [];
 end
+% if scatterer_num>0
+%     [x_cen,y_cen,z_cen,x_dep,y_dep,z_dep,scatterer_num]=scatterer_config(confg_dim,scatterer_num,...
+%     scatterer_dim,scatterer_dis,NodeLocTx,NodeLocRx,IndoorSwitch, ...
+%     scatterer_confg,scatterer_height_max);
+%     scatterer_num=length(x_cen);
+%     s=scatterer_generation(s,confg_dim,scatterer_num,...
+%     x_cen,y_cen,z_cen,x_dep,y_dep,z_dep,IndoorSwitch);
+%     % for i=1:scatterer_num
+%     %     idx=1;
+%     %     while (NodeLocTx(1)>x_cen(i)-0.5*x_dep(i)&&NodeLocTx(1)<x_cen(i)+0.5*x_dep(i)&&...
+%     %             NodeLocTx(2)>y_cen(i)-0.5*y_dep(i)&&NodeLocTx(2)<y_cen(i)+0.5*y_dep(i)&&...
+%     %             NodeLocTx(3)>z_cen(i)-0.5*z_dep(i)&&NodeLocTx(3)<z_cen(i)+0.5*z_dep(i))||...
+%     %             (NodeLocRx(1)>x_cen(i)-0.5*x_dep(i)&&NodeLocRx(1)<x_cen(i)+0.5*x_dep(i)&&...
+%     %             NodeLocRx(2)>y_cen(i)-0.5*y_dep(i)&&NodeLocRx(2)<y_cen(i)+0.5*y_dep(i)&&...
+%     %             NodeLocRx(3)>z_cen(i)-0.5*z_dep(i)&&NodeLocRx(3)<z_cen(i)+0.5*z_dep(i))
+%     %         [x_cen,y_cen,z_cen,x_dep,y_dep,z_dep,scatterer_num]=scatterer_config(confg_dim,scatterer_num,...
+%     %     scatterer_dim,scatterer_dis,NodeLocTx,NodeLocRx,IndoorSwitch, ...
+%     %     scatterer_confg,scatterer_height_max);
+%     %         s=scatterer_generation(s,confg_dim,scatterer_num,...
+%     %     x_cen,y_cen,z_cen,x_dep,y_dep,z_dep,IndoorSwitch);
+%     %         idx=idx+1;
+%     %         if idx>10
+%     %             error('inappropriate configuration, reduce the number or dimension of scatterers')
+%     %         end
+%     %     end 
+%     % end
+%     % In xmlreader.m, a potential modification
+%     % for i=1:scatterer_num
+%     %     is_overlapping = true;
+%     %     attempt = 0;
+%     % 
+%     %     while is_overlapping && attempt < 20 % Try 20 times for just this one scatterer
+%     % 
+%     %         % Bounding box check for the i-th scatterer
+%     %         tx_in = (NodeLocTx(1) > x_cen(i)-0.5*x_dep(i) && NodeLocTx(2) > y_cen(i)-0.5*y_dep(i) && NodeLocTx(3) > z_cen(i)-0.5*z_dep(i)); % (shortened for clarity)
+%     %         rx_in = (NodeLocRx(1) > x_cen(i)-0.5*x_dep(i) && NodeLocRx(2) > y_cen(i)-0.5*y_dep(i) && NodeLocRx(3) > z_cen(i)-0.5*z_dep(i)); % (shortened for clarity)
+%     % 
+%     %         if tx_in || rx_in
+%     %             % Regenerate ONLY the properties for the i-th scatterer
+%     %             [new_xc, new_yc, new_zc, new_xd, new_yd, new_zd, ~] = scatterer_config(confg_dim,scatterer_num,scatterer_dim,scatterer_dis, ...
+%     %                 NodeLocTx,NodeLocRx,IndoorSwitch,scatterer_confg,scatterer_height_max);
+%     % 
+%     %             % Update the properties for just this scatterer
+%     %             % x_cen(i) = new_xc; y_cen(i) = new_yc; z_cen(i) = new_zc;
+%     %             % x_dep(i) = new_xd; y_dep(i) = new_yd; z_dep(i) = new_zd;
+%     %             x_cen(i) = new_xc(i); y_cen(i) = new_yc(i); z_cen(i) = new_zc(i);
+%     %             x_dep(i) = new_xd(i); y_dep(i) = new_yd(i); z_dep(i) = new_zd(i);
+%     % 
+%     %             attempt = attempt + 1;
+%     %             is_overlapping = true;
+%     %         else
+%     %             is_overlapping = false;
+%     %         end
+%     %     end
+%     % 
+%     %     if attempt >= 100
+%     %         error('Could not place scatterer %d without overlapping Tx/Rx.', i);
+%     %     end
+%     indices_to_delete = [];
+% 
+%     % Loop through each finalized scatterer to check for overlap
+%     for i = 1:scatterer_num
+%         % Bounding Box Check for scatterer 'i'
+%         tx_is_inside = (NodeLocTx(1) >= x_cen(i) - 0.5 * x_dep(i) && NodeLocTx(1) <= x_cen(i) + 0.5 * x_dep(i) && ...
+%                         NodeLocTx(2) >= y_cen(i) - 0.5 * y_dep(i) && NodeLocTx(2) <= y_cen(i) + 0.5 * y_dep(i) && ...
+%                         NodeLocTx(3) >= z_cen(i) - 0.5 * z_dep(i) && NodeLocTx(3) <= z_cen(i) + 0.5 * z_dep(i));
+% 
+%         rx_is_inside = (NodeLocRx(1) >= x_cen(i) - 0.5 * x_dep(i) && NodeLocRx(1) <= x_cen(i) + 0.5 * x_dep(i) && ...
+%                         NodeLocRx(2) >= y_cen(i) - 0.5 * y_dep(i) && NodeLocRx(2) <= y_cen(i) + 0.5 * y_dep(i) && ...
+%                         NodeLocRx(3) >= z_cen(i) - 0.5 * z_dep(i) && NodeLocRx(3) <= z_cen(i) + 0.5 * z_dep(i));
+% 
+%         if tx_is_inside || rx_is_inside
+%             fprintf('    WARNING: Scatterer %d encloses a Tx/Rx node. Marking for removal.\n', i);
+%             indices_to_delete = [indices_to_delete, i];
+%         end
+%     end
+% 
+%     % If any scatterers were marked for deletion, remove them
+%     if ~isempty(indices_to_delete)
+%         % Remove the conflicting scatterers from the properties arrays
+%         x_cen(indices_to_delete) = [];
+%         y_cen(indices_to_delete) = [];
+%         z_cen(indices_to_delete) = [];
+%         x_dep(indices_to_delete) = [];
+%         y_dep(indices_to_delete) = [];
+%         z_dep(indices_to_delete) = [];
+% 
+%         % Update the official scatterer count
+%         num_deleted = length(indices_to_delete);
+%         scatterer_num = scatterer_num - num_deleted;
+%         warning('Removed %d overlapping scatterer(s). Final scatterer count is now %d.', num_deleted, scatterer_num);
+% 
+%         % The cleanest way to update the scene is to reload the base environment
+%         % and regenerate ONLY the valid scatterers.
+%         % s = xml2struct(filename); % Reload the original file
+%         % s.amf.metadata.Text='Yunqi Feng';
+%         % if isempty(scatterer_confg)
+%         %      s = scenario_generation(s,confg_dim,IndoorSwitch); % Re-add walls/floor
+%         %      % s = scatterer_generation(s,confg_dim,scatterer_num, ...
+%         %      %     x_cen,y_cen,z_cen,x_dep,y_dep,z_dep,IndoorSwitch);
+%         % end
+%     end
+% else
+%     s=scenario_generation(s,confg_dim,IndoorSwitch);
+%     scatterer_confg=[];
+% end
+        
+        % After the loop, all scatterers have valid positions.
+        % Now, generate the geometry for all of them at once.
+%         s = scatterer_generation(s, confg_dim, scatterer_num, x_cen, y_cen, z_cen, x_dep, y_dep, z_dep, IndoorSwitch);
+%         scatterer_confg_tmp=[x_cen;y_cen;z_cen;x_dep;y_dep;z_dep];
+%         if ~isempty(scatterer_confg)
+%             scatterer_confg=scatterer_confg;
+%         else
+%             scatterer_confg=[scatterer_confg scatterer_confg_tmp];
+%         end
+%     end
+% else
+%     s=scenario_generation(s,confg_dim,IndoorSwitch);
+%     scatterer_confg=[];
+% end
 if isfield(s.amf, 'material')
     materialSwitch = 1;
     

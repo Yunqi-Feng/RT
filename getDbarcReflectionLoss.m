@@ -1,6 +1,6 @@
 function [reflectionLoss,diffuseLoss,scatterPaths,tmp_plane,plane_mat] = getDbarcReflectionLoss(materialLibrary, arrayOfMaterials, ...
     multipath,Incident_angle,mat_confg,IndoorSwitch,polarization,...
-    Jones,scattering,ArrayOfPlanes,tmp_plane,plane_mat,dod,doa)
+    Jones,scattering,ArrayOfPlanes,tmp_plane,plane_mat)
 % GETDBARCREFLECTIONLOSS returns the ray reflection loss based on IMEC 
 % D-band radio measurements
 % 
@@ -52,754 +52,754 @@ normal = ArrayOfPlanes(end-3:end-1);
 if IndoorSwitch==1
     mat_indoor=[1,2,3,4,5,6];
     for i=1:length(mat_indoor)
-        if materialLibrary.refreactiveindex(mat_indoor(i))==0
+        if materialLibrary.permittivity(mat_indoor(i))==0
             switch mat_confg(i)
                 case 1
                     tmp=17;
                 case 2
                     tmp=randi([15 16]);
                 case 3
-                    tmp=26;
+                    tmp=18;
                 case 4
                     index=[8 9 10 11 12 13 14];
                     tmp=index(randperm(numel(index),1));
                 otherwise
                     error('Undefined material')
             end
-            materialLibrary.refreactiveindex(mat_indoor(i))=materialLibrary.refreactiveindex(tmp);
-            materialLibrary.absortionrate(mat_indoor(i))=materialLibrary.absortionrate(tmp);
+            materialLibrary.permittivity(mat_indoor(i))=materialLibrary.permittivity(tmp);
+            materialLibrary.conductivity(mat_indoor(i))=materialLibrary.conductivity(tmp);
             materialLibrary.roughness(mat_indoor(i))=materialLibrary.roughness(tmp);
         end
     end
     if length(arrayOfMaterials)==1
         if arrayOfMaterials==7 && sum(ismember(ArrayOfPlanes(2:5),tmp_plane))~=4
-            index=[8,9,10,11,12,13,14,18,19,20,21,22,23,24,25,26];
+            index=[8,9,10,11,12,13,14,18];
             scatterer_index=index(randperm(numel(index),1));
-            materialLibrary.refreactiveindex(7)=materialLibrary.refreactiveindex(scatterer_index);
-            materialLibrary.absortionrate(7)=materialLibrary.absortionrate(scatterer_index);
+            materialLibrary.permittivity(7)=materialLibrary.permittivity(scatterer_index);
+            materialLibrary.conductivity(7)=materialLibrary.conductivity(scatterer_index);
             materialLibrary.roughness(7)=materialLibrary.roughness(scatterer_index);
             tmp_plane=[tmp_plane;ArrayOfPlanes(2:5)];
-            plane_mat=[plane_mat;materialLibrary.refreactiveindex(7) materialLibrary.absortionrate(7) materialLibrary.roughness(7)];
+            plane_mat=[plane_mat;materialLibrary.permittivity(7) materialLibrary.conductivity(7) materialLibrary.roughness(7)];
         elseif ~isempty(tmp_plane) && arrayOfMaterials==7 && sum(ismember(ArrayOfPlanes(2:5),tmp_plane,'rows'))==1
             [~,idx]= ismember(ArrayOfPlanes(2:5),tmp_plane, 'rows');
-            materialLibrary.refreactiveindex(7)=plane_mat(idx,1);
-            materialLibrary.absortionrate(7)=plane_mat(idx,2);
+            materialLibrary.permittivity(7)=plane_mat(idx,1);
+            materialLibrary.conductivity(7)=plane_mat(idx,2);
             materialLibrary.roughness(7)=plane_mat(idx,3);
         end
     elseif length(arrayOfMaterials)==2
         if arrayOfMaterials(1)==7 && sum(ismember(ArrayOfPlanes(2:5),tmp_plane))~=4 && arrayOfMaterials(2)~=7
-            index=[8,9,10,11,12,13,14,18,19,20,21,22,23,24,25,26];
+            index=[8,9,10,11,12,13,14,18];
             scatterer_index=index(randperm(numel(index),1));
-            materialLibrary.refreactiveindex(7)=materialLibrary.refreactiveindex(scatterer_index);
-            materialLibrary.absortionrate(7)=materialLibrary.absortionrate(scatterer_index);
+            materialLibrary.permittivity(7)=materialLibrary.permittivity(scatterer_index);
+            materialLibrary.conductivity(7)=materialLibrary.conductivity(scatterer_index);
             materialLibrary.roughness(7)=materialLibrary.roughness(scatterer_index);
             tmp_plane=[tmp_plane;ArrayOfPlanes(2:5)];
-            plane_mat=[plane_mat;materialLibrary.refreactiveindex(7) materialLibrary.absortionrate(7) materialLibrary.roughness(7)];
+            plane_mat=[plane_mat;materialLibrary.permittivity(7) materialLibrary.conductivity(7) materialLibrary.roughness(7)];
         elseif ~isempty(tmp_plane) && arrayOfMaterials(1)==7 && sum(ismember(ArrayOfPlanes(2:5),tmp_plane,'rows'))==1 && arrayOfMaterials(2)~=7
             [~,idx]= ismember(ArrayOfPlanes(2:5),tmp_plane, 'rows');
-            materialLibrary.refreactiveindex(7)=plane_mat(idx,1);
-            materialLibrary.absortionrate(7)=plane_mat(idx,2);
+            materialLibrary.permittivity(7)=plane_mat(idx,1);
+            materialLibrary.conductivity(7)=plane_mat(idx,2);
             materialLibrary.roughness(7)=plane_mat(idx,3);
         elseif arrayOfMaterials(2)==7 && sum(ismember(ArrayOfPlanes(6:9),tmp_plane))~=4 && arrayOfMaterials(1)~=7
-            index=[8,9,10,11,12,13,14,18,19,20,21,22,23,24,25,26];
+            index=[8,9,10,11,12,13,14,18];
             scatterer_index=index(randperm(numel(index),1));
-            materialLibrary.refreactiveindex(7)=materialLibrary.refreactiveindex(scatterer_index);
-            materialLibrary.absortionrate(7)=materialLibrary.absortionrate(scatterer_index);
+            materialLibrary.permittivity(7)=materialLibrary.permittivity(scatterer_index);
+            materialLibrary.conductivity(7)=materialLibrary.conductivity(scatterer_index);
             materialLibrary.roughness(7)=materialLibrary.roughness(scatterer_index);
             tmp_plane=[tmp_plane;ArrayOfPlanes(6:9)];
-            plane_mat=[plane_mat;materialLibrary.refreactiveindex(7) materialLibrary.absortionrate(7) materialLibrary.roughness(7)];
+            plane_mat=[plane_mat;materialLibrary.permittivity(7) materialLibrary.conductivity(7) materialLibrary.roughness(7)];
         elseif ~isempty(tmp_plane) && arrayOfMaterials(2)==7 && sum(ismember(ArrayOfPlanes(6:9),tmp_plane,'rows'))==1  && arrayOfMaterials(1)~=7
             [~,idx]= ismember(ArrayOfPlanes(6:9),tmp_plane, 'rows');
-            materialLibrary.refreactiveindex(7)=plane_mat(idx,1);
-            materialLibrary.absortionrate(7)=plane_mat(idx,2);
+            materialLibrary.permittivity(7)=plane_mat(idx,1);
+            materialLibrary.conductivity(7)=plane_mat(idx,2);
             materialLibrary.roughness(7)=plane_mat(idx,3);
         elseif arrayOfMaterials(1)==7 && arrayOfMaterials(2)==7 && sum(ismember(ArrayOfPlanes(2:5),tmp_plane))~=4 && (~isempty(tmp_plane) && sum(ismember(ArrayOfPlanes(6:9),tmp_plane,'rows'))==1)
-            index=[8,9,10,11,12,13,14,18,19,20,21,22,23,24,25,26];
+            index=[8,9,10,11,12,13,14,18];
             scatterer_index=index(randperm(numel(index),1));
-            materialLibrary.refreactiveindex(7)=materialLibrary.refreactiveindex(scatterer_index);
-            materialLibrary.absortionrate(7)=materialLibrary.absortionrate(scatterer_index);
+            materialLibrary.permittivity(7)=materialLibrary.permittivity(scatterer_index);
+            materialLibrary.conductivity(7)=materialLibrary.conductivity(scatterer_index);
             materialLibrary.roughness(7)=materialLibrary.roughness(scatterer_index);
             tmp_plane=[tmp_plane;ArrayOfPlanes(2:5)];
-            plane_mat=[plane_mat;materialLibrary.refreactiveindex(7) materialLibrary.absortionrate(7) materialLibrary.roughness(7)];
+            plane_mat=[plane_mat;materialLibrary.permittivity(7) materialLibrary.conductivity(7) materialLibrary.roughness(7)];
             [~,scatterer2_index]= ismember(ArrayOfPlanes(6:9),tmp_plane, 'rows');
-            scatterer2_ref=plane_mat(scatterer2_index,1);
-            scatterer2_abs=plane_mat(scatterer2_index,2);
+            scatterer2_per=plane_mat(scatterer2_index,1);
+            scatterer2_con=plane_mat(scatterer2_index,2);
             scatterer2_rou=plane_mat(scatterer2_index,3);
         elseif arrayOfMaterials(1)==7 && arrayOfMaterials(2)==7 && sum(ismember(ArrayOfPlanes(6:9),tmp_plane))~=4 && (~isempty(tmp_plane) && sum(ismember(ArrayOfPlanes(2:5),tmp_plane,'rows'))==1)
             [~,idx]= ismember(ArrayOfPlanes(2:5),tmp_plane, 'rows');
-            materialLibrary.refreactiveindex(7)=plane_mat(idx,1);
-            materialLibrary.absortionrate(7)=plane_mat(idx,2);
+            materialLibrary.permittivity(7)=plane_mat(idx,1);
+            materialLibrary.conductivity(7)=plane_mat(idx,2);
             materialLibrary.roughness(7)=plane_mat(idx,3);
-            index=[8,9,10,11,12,13,14,18,19,20,21,22,23,24,25,26];
+            index=[8,9,10,11,12,13,14,18];
             scatterer2_index=index(randperm(numel(index),1));
-            scatterer2_ref=materialLibrary.refreactiveindex(scatterer2_index);
-            scatterer2_abs=materialLibrary.absortionrate(scatterer2_index);
+            scatterer2_per=materialLibrary.permittivity(scatterer2_index);
+            scatterer2_con=materialLibrary.conductivity(scatterer2_index);
             scatterer2_rou=materialLibrary.roughness(scatterer2_index);
             tmp_plane=[tmp_plane;ArrayOfPlanes(6:9)];
-            plane_mat=[plane_mat;scatterer2_ref materialLibrary.absortionrate(7) materialLibrary.roughness(7)];
+            plane_mat=[plane_mat;scatterer2_per materialLibrary.conductivity(7) materialLibrary.roughness(7)];
         elseif arrayOfMaterials(1)==7 && arrayOfMaterials(2)==7 && sum(ismember(ArrayOfPlanes(2:5),tmp_plane))~=4 && sum(ismember(ArrayOfPlanes(6:9),tmp_plane))~=4
-            index=[8,9,10,11,12,13,14,18,19,20,21,22,23,24,25,26];
+            index=[8,9,10,11,12,13,14,18];
             scatterer_index=index(randperm(numel(index),1));
-            materialLibrary.refreactiveindex(7)=materialLibrary.refreactiveindex(scatterer_index);
-            materialLibrary.absortionrate(7)=materialLibrary.absortionrate(scatterer_index);
+            materialLibrary.permittivity(7)=materialLibrary.permittivity(scatterer_index);
+            materialLibrary.conductivity(7)=materialLibrary.conductivity(scatterer_index);
             materialLibrary.roughness(7)=materialLibrary.roughness(scatterer_index);
             tmp_plane=[tmp_plane;ArrayOfPlanes(2:5)];
-            plane_mat=[plane_mat;materialLibrary.refreactiveindex(7) materialLibrary.absortionrate(7) materialLibrary.roughness(7)];
+            plane_mat=[plane_mat;materialLibrary.permittivity(7) materialLibrary.conductivity(7) materialLibrary.roughness(7)];
             scatterer2_index=index(randperm(numel(index),1));
-            scatterer2_ref=materialLibrary.refreactiveindex(scatterer2_index);
-            scatterer2_abs=materialLibrary.absortionrate(scatterer2_index);
+            scatterer2_per=materialLibrary.permittivity(scatterer2_index);
+            scatterer2_con=materialLibrary.conductivity(scatterer2_index);
             scatterer2_rou=materialLibrary.roughness(scatterer2_index);
             tmp_plane=[tmp_plane;ArrayOfPlanes(6:9)];
-            plane_mat=[plane_mat;scatterer2_ref scatterer2_abs scatterer2_rou];
+            plane_mat=[plane_mat;scatterer2_per scatterer2_con scatterer2_rou];
         elseif arrayOfMaterials(1)==7 && arrayOfMaterials(2)==7 && (~isempty(tmp_plane) && sum(ismember(ArrayOfPlanes(6:9),tmp_plane,'rows'))==1) && (~isempty(tmp_plane) && sum(ismember(ArrayOfPlanes(2:5),tmp_plane,'rows'))==1)
             [~,idx]= ismember(ArrayOfPlanes(2:5),tmp_plane, 'rows');
-            materialLibrary.refreactiveindex(7)=plane_mat(idx,1);
-            materialLibrary.absortionrate(7)=plane_mat(idx,2);
+            materialLibrary.permittivity(7)=plane_mat(idx,1);
+            materialLibrary.conductivity(7)=plane_mat(idx,2);
             materialLibrary.roughness(7)=plane_mat(idx,3);
             [~,idx]= ismember(ArrayOfPlanes(6:9),tmp_plane, 'rows'); 
-            scatterer2_ref=plane_mat(idx,1);
-            scatterer2_abs=plane_mat(idx,2);
+            scatterer2_per=plane_mat(idx,1);
+            scatterer2_con=plane_mat(idx,2);
             scatterer2_rou=plane_mat(idx,3);
         end
     elseif length(arrayOfMaterials)==3
         if arrayOfMaterials(1)==7 && sum(ismember(ArrayOfPlanes(2:5),tmp_plane))~=4 && arrayOfMaterials(2)~=7 && arrayOfMaterials(3)~=7
-            index=[8,9,10,11,12,13,14,18,19,20,21,22,23,24,25,26];
+            index=[8,9,10,11,12,13,14,18];
             scatterer_index=index(randperm(numel(index),1));
-            materialLibrary.refreactiveindex(7)=materialLibrary.refreactiveindex(scatterer_index);
-            materialLibrary.absortionrate(7)=materialLibrary.absortionrate(scatterer_index);
+            materialLibrary.permittivity(7)=materialLibrary.permittivity(scatterer_index);
+            materialLibrary.conductivity(7)=materialLibrary.conductivity(scatterer_index);
             materialLibrary.roughness(7)=materialLibrary.roughness(scatterer_index);
             tmp_plane=[tmp_plane;ArrayOfPlanes(2:5)];
-            plane_mat=[plane_mat;materialLibrary.refreactiveindex(7) materialLibrary.absortionrate(7) materialLibrary.roughness(7)];
+            plane_mat=[plane_mat;materialLibrary.permittivity(7) materialLibrary.conductivity(7) materialLibrary.roughness(7)];
         elseif ~isempty(tmp_plane) && arrayOfMaterials(1)==7 && sum(ismember(ArrayOfPlanes(2:5),tmp_plane,'rows'))==1 && arrayOfMaterials(2)~=7 && arrayOfMaterials(3)~=7
             [~,idx]= ismember(ArrayOfPlanes(2:5),tmp_plane, 'rows');
-            materialLibrary.refreactiveindex(7)=plane_mat(idx,1);
-            materialLibrary.absortionrate(7)=plane_mat(idx,2);
+            materialLibrary.permittivity(7)=plane_mat(idx,1);
+            materialLibrary.conductivity(7)=plane_mat(idx,2);
             materialLibrary.roughness(7)=plane_mat(idx,3);
         elseif arrayOfMaterials(2)==7 && sum(ismember(ArrayOfPlanes(6:9),tmp_plane))~=4 && arrayOfMaterials(1)~=7 && arrayOfMaterials(3)~=7
-            index=[8,9,10,11,12,13,14,18,19,20,21,22,23,24,25,26];
+            index=[8,9,10,11,12,13,14,18];
             scatterer_index=index(randperm(numel(index),1));
-            materialLibrary.refreactiveindex(7)=materialLibrary.refreactiveindex(scatterer_index);
-            materialLibrary.absortionrate(7)=materialLibrary.absortionrate(scatterer_index);
+            materialLibrary.permittivity(7)=materialLibrary.permittivity(scatterer_index);
+            materialLibrary.conductivity(7)=materialLibrary.conductivity(scatterer_index);
             materialLibrary.roughness(7)=materialLibrary.roughness(scatterer_index);
             tmp_plane=[tmp_plane;ArrayOfPlanes(6:9)];
-            plane_mat=[plane_mat;materialLibrary.refreactiveindex(7) materialLibrary.absortionrate(7) materialLibrary.roughness(7)];
+            plane_mat=[plane_mat;materialLibrary.permittivity(7) materialLibrary.conductivity(7) materialLibrary.roughness(7)];
         elseif ~isempty(tmp_plane) && arrayOfMaterials(2)==7 && sum(ismember(ArrayOfPlanes(6:9),tmp_plane,'rows'))==1  && arrayOfMaterials(1)~=7 && arrayOfMaterials(3)~=7
             [~,idx]= ismember(ArrayOfPlanes(6:9),tmp_plane, 'rows');
-            materialLibrary.refreactiveindex(7)=plane_mat(idx,1);
-            materialLibrary.absortionrate(7)=plane_mat(idx,2);
+            materialLibrary.permittivity(7)=plane_mat(idx,1);
+            materialLibrary.conductivity(7)=plane_mat(idx,2);
             materialLibrary.roughness(7)=plane_mat(idx,3);
         elseif arrayOfMaterials(1)==7 && arrayOfMaterials(2)==7 && sum(ismember(ArrayOfPlanes(2:5),tmp_plane))~=4 && (~isempty(tmp_plane) && sum(ismember(ArrayOfPlanes(6:9),tmp_plane,'rows'))==1) && arrayOfMaterials(3)~=7
-            index=[8,9,10,11,12,13,14,18,19,20,21,22,23,24,25,26];
+            index=[8,9,10,11,12,13,14,18];
             scatterer_index=index(randperm(numel(index),1));
-            materialLibrary.refreactiveindex(7)=materialLibrary.refreactiveindex(scatterer_index);
-            materialLibrary.absortionrate(7)=materialLibrary.absortionrate(scatterer_index);
+            materialLibrary.permittivity(7)=materialLibrary.permittivity(scatterer_index);
+            materialLibrary.conductivity(7)=materialLibrary.conductivity(scatterer_index);
             materialLibrary.roughness(7)=materialLibrary.roughness(scatterer_index);
             tmp_plane=[tmp_plane;ArrayOfPlanes(2:5)];
-            plane_mat=[plane_mat;materialLibrary.refreactiveindex(7) materialLibrary.absortionrate(7) materialLibrary.roughness(7)];
+            plane_mat=[plane_mat;materialLibrary.permittivity(7) materialLibrary.conductivity(7) materialLibrary.roughness(7)];
             [~,scatterer2_index]= ismember(ArrayOfPlanes(6:9),tmp_plane, 'rows');
-            scatterer2_ref=plane_mat(scatterer2_index,1);
-            scatterer2_abs=plane_mat(scatterer2_index,2);
+            scatterer2_per=plane_mat(scatterer2_index,1);
+            scatterer2_con=plane_mat(scatterer2_index,2);
             scatterer2_rou=plane_mat(scatterer2_index,3);
         elseif arrayOfMaterials(1)==7 && arrayOfMaterials(2)==7 && sum(ismember(ArrayOfPlanes(6:9),tmp_plane))~=4 && (~isempty(tmp_plane) && sum(ismember(ArrayOfPlanes(2:5),tmp_plane,'rows'))==1) && arrayOfMaterials(3)~=7
             [~,idx]= ismember(ArrayOfPlanes(2:5),tmp_plane, 'rows');
-            materialLibrary.refreactiveindex(7)=plane_mat(idx,1);
-            materialLibrary.absortionrate(7)=plane_mat(idx,2);
+            materialLibrary.permittivity(7)=plane_mat(idx,1);
+            materialLibrary.conductivity(7)=plane_mat(idx,2);
             materialLibrary.roughness(7)=plane_mat(idx,3);
-            index=[8,9,10,11,12,13,14,18,19,20,21,22,23,24,25,26];
+            index=[8,9,10,11,12,13,14,18];
             scatterer2_index=index(randperm(numel(index),1));
-            scatterer2_ref=materialLibrary.refreactiveindex(scatterer2_index);
-            scatterer2_abs=materialLibrary.absortionrate(scatterer2_index);
+            scatterer2_per=materialLibrary.permittivity(scatterer2_index);
+            scatterer2_con=materialLibrary.conductivity(scatterer2_index);
             scatterer2_rou=materialLibrary.roughness(scatterer2_index);
             tmp_plane=[tmp_plane;ArrayOfPlanes(6:9)];
-            plane_mat=[plane_mat;scatterer2_ref materialLibrary.absortionrate(7) materialLibrary.roughness(7)];
+            plane_mat=[plane_mat;scatterer2_per materialLibrary.conductivity(7) materialLibrary.roughness(7)];
         elseif arrayOfMaterials(1)==7 && arrayOfMaterials(2)==7 && sum(ismember(ArrayOfPlanes(2:5),tmp_plane))~=4 && sum(ismember(ArrayOfPlanes(6:9),tmp_plane))~=4 && arrayOfMaterials(3)~=7
-            index=[8,9,10,11,12,13,14,18,19,20,21,22,23,24,25,26];
+            index=[8,9,10,11,12,13,14,18];
             scatterer_index=index(randperm(numel(index),1));
-            materialLibrary.refreactiveindex(7)=materialLibrary.refreactiveindex(scatterer_index);
-            materialLibrary.absortionrate(7)=materialLibrary.absortionrate(scatterer_index);
+            materialLibrary.permittivity(7)=materialLibrary.permittivity(scatterer_index);
+            materialLibrary.conductivity(7)=materialLibrary.conductivity(scatterer_index);
             materialLibrary.roughness(7)=materialLibrary.roughness(scatterer_index);
             tmp_plane=[tmp_plane;ArrayOfPlanes(2:5)];
-            plane_mat=[plane_mat;materialLibrary.refreactiveindex(7) materialLibrary.absortionrate(7) materialLibrary.roughness(7)];
+            plane_mat=[plane_mat;materialLibrary.permittivity(7) materialLibrary.conductivity(7) materialLibrary.roughness(7)];
             scatterer2_index=index(randperm(numel(index),1));
-            scatterer2_ref=materialLibrary.refreactiveindex(scatterer2_index);
-            scatterer2_abs=materialLibrary.absortionrate(scatterer2_index);
+            scatterer2_per=materialLibrary.permittivity(scatterer2_index);
+            scatterer2_con=materialLibrary.conductivity(scatterer2_index);
             scatterer2_rou=materialLibrary.roughness(scatterer2_index);
             tmp_plane=[tmp_plane;ArrayOfPlanes(6:9)];
-            plane_mat=[plane_mat;scatterer2_ref scatterer2_abs scatterer2_rou];
+            plane_mat=[plane_mat;scatterer2_per scatterer2_con scatterer2_rou];
         elseif arrayOfMaterials(1)==7 && arrayOfMaterials(2)==7 && (~isempty(tmp_plane) && sum(ismember(ArrayOfPlanes(6:9),tmp_plane,'rows'))==1) && (~isempty(tmp_plane) && sum(ismember(ArrayOfPlanes(2:5),tmp_plane,'rows'))==1) && arrayOfMaterials(3)~=7
             [~,idx]= ismember(ArrayOfPlanes(2:5),tmp_plane, 'rows');
-            materialLibrary.refreactiveindex(7)=plane_mat(idx,1);
-            materialLibrary.absortionrate(7)=plane_mat(idx,2);
+            materialLibrary.permittivity(7)=plane_mat(idx,1);
+            materialLibrary.conductivity(7)=plane_mat(idx,2);
             materialLibrary.roughness(7)=plane_mat(idx,3);
             [~,idx]= ismember(ArrayOfPlanes(6:9),tmp_plane, 'rows'); 
-            scatterer2_ref=plane_mat(idx,1);
-            scatterer2_abs=plane_mat(idx,2);
+            scatterer2_per=plane_mat(idx,1);
+            scatterer2_con=plane_mat(idx,2);
             scatterer2_rou=plane_mat(idx,3);
         elseif arrayOfMaterials(2)==7 && sum(ismember(ArrayOfPlanes(6:9),tmp_plane))~=4 && arrayOfMaterials(1)~=7 && arrayOfMaterials(3)==7 && sum(ismember(ArrayOfPlanes(10:13),tmp_plane))~=4
-            index=[8,9,10,11,12,13,14,18,19,20,21,22,23,24,25,26];
+            index=[8,9,10,11,12,13,14,18];
             scatterer_index=index(randperm(numel(index),1));
-            materialLibrary.refreactiveindex(7)=materialLibrary.refreactiveindex(scatterer_index);
-            materialLibrary.absortionrate(7)=materialLibrary.absortionrate(scatterer_index);
+            materialLibrary.permittivity(7)=materialLibrary.permittivity(scatterer_index);
+            materialLibrary.conductivity(7)=materialLibrary.conductivity(scatterer_index);
             materialLibrary.roughness(7)=materialLibrary.roughness(scatterer_index);
             tmp_plane=[tmp_plane;ArrayOfPlanes(6:9)];
-            plane_mat=[plane_mat;materialLibrary.refreactiveindex(7) materialLibrary.absortionrate(7) materialLibrary.roughness(7)];
+            plane_mat=[plane_mat;materialLibrary.permittivity(7) materialLibrary.conductivity(7) materialLibrary.roughness(7)];
             scatterer2_index=index(randperm(numel(index),1));
-            scatterer2_ref=materialLibrary.refreactiveindex(scatterer2_index);
-            scatterer2_abs=materialLibrary.absortionrate(scatterer2_index);
+            scatterer2_per=materialLibrary.permittivity(scatterer2_index);
+            scatterer2_con=materialLibrary.conductivity(scatterer2_index);
             scatterer2_rou=materialLibrary.roughness(scatterer2_index);
             tmp_plane=[tmp_plane;ArrayOfPlanes(10:13)];
-            plane_mat=[plane_mat;scatterer2_ref scatterer2_abs scatterer2_rou];
+            plane_mat=[plane_mat;scatterer2_per scatterer2_con scatterer2_rou];
         elseif ~isempty(tmp_plane) && arrayOfMaterials(2)==7 && sum(ismember(ArrayOfPlanes(6:9),tmp_plane,'rows'))==1 && arrayOfMaterials(1)~=7 && arrayOfMaterials(3)==7 && sum(ismember(ArrayOfPlanes(10:13),tmp_plane))~=4
             [~,idx]= ismember(ArrayOfPlanes(6:9),tmp_plane, 'rows');
-            materialLibrary.refreactiveindex(7)=plane_mat(idx,1);
-            materialLibrary.absortionrate(7)=plane_mat(idx,2);
+            materialLibrary.permittivity(7)=plane_mat(idx,1);
+            materialLibrary.conductivity(7)=plane_mat(idx,2);
             materialLibrary.roughness(7)=plane_mat(idx,3);
-            index=[8,9,10,11,12,13,14,18,19,20,21,22,23,24,25,26];
+            index=[8,9,10,11,12,13,14,18];
             scatterer2_index=index(randperm(numel(index),1));
-            scatterer2_ref=materialLibrary.refreactiveindex(scatterer2_index);
-            scatterer2_abs=materialLibrary.absortionrate(scatterer2_index);
+            scatterer2_per=materialLibrary.permittivity(scatterer2_index);
+            scatterer2_con=materialLibrary.conductivity(scatterer2_index);
             scatterer2_rou=materialLibrary.roughness(scatterer2_index);
             tmp_plane=[tmp_plane;ArrayOfPlanes(10:13)];
-            plane_mat=[plane_mat;scatterer2_ref scatterer2_abs scatterer2_rou];
+            plane_mat=[plane_mat;scatterer2_per scatterer2_con scatterer2_rou];
         elseif ~isempty(tmp_plane) && arrayOfMaterials(2)==7 && sum(ismember(ArrayOfPlanes(6:9),tmp_plane,'rows'))==1 && arrayOfMaterials(1)~=7 && arrayOfMaterials(3)==7 && sum(ismember(ArrayOfPlanes(10:13),tmp_plane,'rows'))==1
             [~,idx]= ismember(ArrayOfPlanes(6:9),tmp_plane, 'rows');
-            materialLibrary.refreactiveindex(7)=plane_mat(idx,1);
-            materialLibrary.absortionrate(7)=plane_mat(idx,2);
+            materialLibrary.permittivity(7)=plane_mat(idx,1);
+            materialLibrary.conductivity(7)=plane_mat(idx,2);
             materialLibrary.roughness(7)=plane_mat(idx,3);
             [~,idx]= ismember(ArrayOfPlanes(10:13),tmp_plane, 'rows');
-            scatterer2_ref=plane_mat(idx,1);
-            scatterer2_abs=plane_mat(idx,2);
+            scatterer2_per=plane_mat(idx,1);
+            scatterer2_con=plane_mat(idx,2);
             scatterer2_rou=plane_mat(idx,3);
         elseif ~isempty(tmp_plane) && arrayOfMaterials(2)==7 && sum(ismember(ArrayOfPlanes(6:9),tmp_plane))~=4 && arrayOfMaterials(1)~=7 && arrayOfMaterials(3)==7 && sum(ismember(ArrayOfPlanes(10:13),tmp_plane,'rows'))==1
-            index=[8,9,10,11,12,13,14,18,19,20,21,22,23,24,25,26];
+            index=[8,9,10,11,12,13,14,18];
             scatterer_index=index(randperm(numel(index),1));
-            materialLibrary.refreactiveindex(7)=materialLibrary.refreactiveindex(scatterer_index);
-            materialLibrary.absortionrate(7)=materialLibrary.absortionrate(scatterer_index);
+            materialLibrary.permittivity(7)=materialLibrary.permittivity(scatterer_index);
+            materialLibrary.conductivity(7)=materialLibrary.conductivity(scatterer_index);
             materialLibrary.roughness(7)=materialLibrary.roughness(scatterer_index);
             tmp_plane=[tmp_plane;ArrayOfPlanes(6:9)];
-            plane_mat=[plane_mat;materialLibrary.refreactiveindex(7) materialLibrary.absortionrate(7) materialLibrary.roughness(7)];
+            plane_mat=[plane_mat;materialLibrary.permittivity(7) materialLibrary.conductivity(7) materialLibrary.roughness(7)];
             [~,idx]= ismember(ArrayOfPlanes(10:13),tmp_plane, 'rows');
-            scatterer2_ref=plane_mat(idx,1);
-            scatterer2_abs=plane_mat(idx,2);
+            scatterer2_per=plane_mat(idx,1);
+            scatterer2_con=plane_mat(idx,2);
             scatterer2_rou=plane_mat(idx,3);
         elseif ~isempty(tmp_plane) && arrayOfMaterials(2)~=7 && arrayOfMaterials(1)~=7 && arrayOfMaterials(3)==7 && sum(ismember(ArrayOfPlanes(10:13),tmp_plane))~=4
-            index=[8,9,10,11,12,13,14,18,19,20,21,22,23,24,25,26];
+            index=[8,9,10,11,12,13,14,18];
             scatterer_index=index(randperm(numel(index),1));
-            materialLibrary.refreactiveindex(7)=materialLibrary.refreactiveindex(scatterer_index);
-            materialLibrary.absortionrate(7)=materialLibrary.absortionrate(scatterer_index);
+            materialLibrary.permittivity(7)=materialLibrary.permittivity(scatterer_index);
+            materialLibrary.conductivity(7)=materialLibrary.conductivity(scatterer_index);
             materialLibrary.roughness(7)=materialLibrary.roughness(scatterer_index);
             tmp_plane=[tmp_plane;ArrayOfPlanes(10:13)];
-            plane_mat=[plane_mat;materialLibrary.refreactiveindex(7) materialLibrary.absortionrate(7) materialLibrary.roughness(7)];
+            plane_mat=[plane_mat;materialLibrary.permittivity(7) materialLibrary.conductivity(7) materialLibrary.roughness(7)];
         elseif ~isempty(tmp_plane) && arrayOfMaterials(2)~=7 && arrayOfMaterials(1)~=7 && arrayOfMaterials(3)==7 && sum(ismember(ArrayOfPlanes(10:13),tmp_plane,'rows'))==1
             [~,idx]= ismember(ArrayOfPlanes(10:13),tmp_plane, 'rows');
-            materialLibrary.refreactiveindex(7)=plane_mat(idx,1);
-            materialLibrary.absortionrate(7)=plane_mat(idx,2);
+            materialLibrary.permittivity(7)=plane_mat(idx,1);
+            materialLibrary.conductivity(7)=plane_mat(idx,2);
             materialLibrary.roughness(7)=plane_mat(idx,3);
         elseif ~isempty(tmp_plane) && arrayOfMaterials(3)==7 && sum(ismember(ArrayOfPlanes(10:13),tmp_plane,'rows'))==1 && arrayOfMaterials(2)==7 && sum(ismember(ArrayOfPlanes(6:9),tmp_plane,'rows'))==1 && arrayOfMaterials(1)==7 && sum(ismember(ArrayOfPlanes(2:5),tmp_plane,'rows'))==1
             [~,idx]= ismember(ArrayOfPlanes(2:5),tmp_plane, 'rows');
-            materialLibrary.refreactiveindex(7)=plane_mat(idx,1);
-            materialLibrary.absortionrate(7)=plane_mat(idx,2);
+            materialLibrary.permittivity(7)=plane_mat(idx,1);
+            materialLibrary.conductivity(7)=plane_mat(idx,2);
             materialLibrary.roughness(7)=plane_mat(idx,3);
             [~,idx]= ismember(ArrayOfPlanes(6:9),tmp_plane, 'rows');
-            scatterer2_ref=plane_mat(idx,1);
-            scatterer2_abs=plane_mat(idx,2);
+            scatterer2_per=plane_mat(idx,1);
+            scatterer2_con=plane_mat(idx,2);
             scatterer2_rou=plane_mat(idx,3);
             [~,idx]= ismember(ArrayOfPlanes(10:13),tmp_plane, 'rows');
-            scatterer3_ref=plane_mat(idx,1);
-            scatterer3_abs=plane_mat(idx,2);
+            scatterer3_per=plane_mat(idx,1);
+            scatterer3_con=plane_mat(idx,2);
             scatterer3_rou=plane_mat(idx,3);
         elseif ~isempty(tmp_plane) && arrayOfMaterials(3)==7 && sum(ismember(ArrayOfPlanes(10:13),tmp_plane,'rows'))==1 && arrayOfMaterials(2)==7 && sum(ismember(ArrayOfPlanes(6:9),tmp_plane,'rows'))==1 && arrayOfMaterials(1)==7 && sum(ismember(ArrayOfPlanes(2:5),tmp_plane))~=4
-            index=[8,9,10,11,12,13,14,18,19,20,21,22,23,24,25,26];
+            index=[8,9,10,11,12,13,14,18];
             scatterer_index=index(randperm(numel(index),1));
-            materialLibrary.refreactiveindex(7)=materialLibrary.refreactiveindex(scatterer_index);
-            materialLibrary.absortionrate(7)=materialLibrary.absortionrate(scatterer_index);
+            materialLibrary.permittivity(7)=materialLibrary.permittivity(scatterer_index);
+            materialLibrary.conductivity(7)=materialLibrary.conductivity(scatterer_index);
             materialLibrary.roughness(7)=materialLibrary.roughness(scatterer_index);
             tmp_plane=[tmp_plane;ArrayOfPlanes(2:5)];
-            plane_mat=[plane_mat;materialLibrary.refreactiveindex(7) materialLibrary.absortionrate(7) materialLibrary.roughness(7)];
+            plane_mat=[plane_mat;materialLibrary.permittivity(7) materialLibrary.conductivity(7) materialLibrary.roughness(7)];
             [~,idx]= ismember(ArrayOfPlanes(6:9),tmp_plane, 'rows');
-            scatterer2_ref=plane_mat(idx,1);
-            scatterer2_abs=plane_mat(idx,2);
+            scatterer2_per=plane_mat(idx,1);
+            scatterer2_con=plane_mat(idx,2);
             scatterer2_rou=plane_mat(idx,3);
             [~,idx]= ismember(ArrayOfPlanes(10:13),tmp_plane, 'rows');
-            scatterer3_ref=plane_mat(idx,1);
-            scatterer3_abs=plane_mat(idx,2);
+            scatterer3_per=plane_mat(idx,1);
+            scatterer3_con=plane_mat(idx,2);
             scatterer3_rou=plane_mat(idx,3);
         elseif ~isempty(tmp_plane) && arrayOfMaterials(3)==7 && sum(ismember(ArrayOfPlanes(10:13),tmp_plane,'rows'))==1 && arrayOfMaterials(2)==7 && sum(ismember(ArrayOfPlanes(2:5),tmp_plane,'rows'))==1 && arrayOfMaterials(1)==7 && sum(ismember(ArrayOfPlanes(6:9),tmp_plane))~=4
             [~,idx]= ismember(ArrayOfPlanes(2:5),tmp_plane, 'rows');
-            materialLibrary.refreactiveindex(7)=plane_mat(idx,1);
-            materialLibrary.absortionrate(7)=plane_mat(idx,2);
+            materialLibrary.permittivity(7)=plane_mat(idx,1);
+            materialLibrary.conductivity(7)=plane_mat(idx,2);
             materialLibrary.roughness(7)=plane_mat(idx,3);
-            index=[8,9,10,11,12,13,14,18,19,20,21,22,23,24,25,26];
+            index=[8,9,10,11,12,13,14,18];
             scatterer_index=index(randperm(numel(index),1));
-            scatterer2_ref=materialLibrary.refreactiveindex(scatterer_index);
-            scatterer2_abs=materialLibrary.absortionrate(scatterer_index);
+            scatterer2_per=materialLibrary.permittivity(scatterer_index);
+            scatterer2_con=materialLibrary.conductivity(scatterer_index);
             scatterer2_rou=materialLibrary.roughness(scatterer_index);
             tmp_plane=[tmp_plane;ArrayOfPlanes(6:9)];
-            plane_mat=[plane_mat;scatterer2_ref scatterer2_abs scatterer2_rou];
+            plane_mat=[plane_mat;scatterer2_per scatterer2_con scatterer2_rou];
             [~,idx]= ismember(ArrayOfPlanes(10:13),tmp_plane, 'rows');
-            scatterer3_ref=plane_mat(idx,1);
-            scatterer3_abs=plane_mat(idx,2);
+            scatterer3_per=plane_mat(idx,1);
+            scatterer3_con=plane_mat(idx,2);
             scatterer3_rou=plane_mat(idx,3);
         elseif ~isempty(tmp_plane) && arrayOfMaterials(3)==7 && sum(ismember(ArrayOfPlanes(6:9),tmp_plane,'rows'))==1 && arrayOfMaterials(2)==7 && sum(ismember(ArrayOfPlanes(2:5),tmp_plane,'rows'))==1 && arrayOfMaterials(1)==7 && sum(ismember(ArrayOfPlanes(10:13),tmp_plane))~=4
             [~,idx]= ismember(ArrayOfPlanes(2:5),tmp_plane, 'rows');
-            materialLibrary.refreactiveindex(7)=plane_mat(idx,1);
-            materialLibrary.absortionrate(7)=plane_mat(idx,2);
+            materialLibrary.permittivity(7)=plane_mat(idx,1);
+            materialLibrary.conductivity(7)=plane_mat(idx,2);
             materialLibrary.roughness(7)=plane_mat(idx,3);
             [~,idx]= ismember(ArrayOfPlanes(6:9),tmp_plane, 'rows');
-            scatterer2_ref=plane_mat(idx,1);
-            scatterer2_abs=plane_mat(idx,2);
+            scatterer2_per=plane_mat(idx,1);
+            scatterer2_con=plane_mat(idx,2);
             scatterer2_rou=plane_mat(idx,3);
-            index=[8,9,10,11,12,13,14,18,19,20,21,22,23,24,25,26];
+            index=[8,9,10,11,12,13,14,18];
             scatterer_index=index(randperm(numel(index),1));
-            scatterer3_ref=materialLibrary.refreactiveindex(scatterer_index);
-            scatterer3_abs=materialLibrary.absortionrate(scatterer_index);
+            scatterer3_per=materialLibrary.permittivity(scatterer_index);
+            scatterer3_con=materialLibrary.conductivity(scatterer_index);
             scatterer3_rou=materialLibrary.roughness(scatterer_index);
             tmp_plane=[tmp_plane;ArrayOfPlanes(10:13)];
-            plane_mat=[plane_mat;scatterer3_ref scatterer3_abs scatterer3_rou];
+            plane_mat=[plane_mat;scatterer3_per scatterer3_con scatterer3_rou];
         elseif ~isempty(tmp_plane) && arrayOfMaterials(3)==7 && sum(ismember(ArrayOfPlanes(6:9),tmp_plane,'rows'))==1 && arrayOfMaterials(2)==7 && sum(ismember(ArrayOfPlanes(6:9),tmp_plane))~=4 && arrayOfMaterials(1)==7 && sum(ismember(ArrayOfPlanes(10:13),tmp_plane))~=4
             [~,idx]= ismember(ArrayOfPlanes(2:5),tmp_plane, 'rows');
-            materialLibrary.refreactiveindex(7)=plane_mat(idx,1);
-            materialLibrary.absortionrate(7)=plane_mat(idx,2);
+            materialLibrary.permittivity(7)=plane_mat(idx,1);
+            materialLibrary.conductivity(7)=plane_mat(idx,2);
             materialLibrary.roughness(7)=plane_mat(idx,3);
-            index=[8,9,10,11,12,13,14,18,19,20,21,22,23,24,25,26];
+            index=[8,9,10,11,12,13,14,18];
             scatterer_index=index(randperm(numel(index),1));
-            scatterer2_ref=materialLibrary.refreactiveindex(scatterer_index);
-            scatterer2_abs=materialLibrary.absortionrate(scatterer_index);
+            scatterer2_per=materialLibrary.permittivity(scatterer_index);
+            scatterer2_con=materialLibrary.conductivity(scatterer_index);
             scatterer2_rou=materialLibrary.roughness(scatterer_index);
             tmp_plane=[tmp_plane;ArrayOfPlanes(6:9)];
-            plane_mat=[plane_mat;scatterer2_ref scatterer2_abs scatterer2_rou];
+            plane_mat=[plane_mat;scatterer2_per scatterer2_con scatterer2_rou];
             scatterer_index=index(randperm(numel(index),1));
-            scatterer3_ref=materialLibrary.refreactiveindex(scatterer_index);
-            scatterer3_abs=materialLibrary.absortionrate(scatterer_index);
+            scatterer3_per=materialLibrary.permittivity(scatterer_index);
+            scatterer3_con=materialLibrary.conductivity(scatterer_index);
             scatterer3_rou=materialLibrary.roughness(scatterer_index);
             tmp_plane=[tmp_plane;ArrayOfPlanes(10:13)];
-            plane_mat=[plane_mat;scatterer3_ref scatterer3_abs scatterer3_rou];
+            plane_mat=[plane_mat;scatterer3_per scatterer3_con scatterer3_rou];
         elseif ~isempty(tmp_plane) && arrayOfMaterials(3)==7 && sum(ismember(ArrayOfPlanes(6:9),tmp_plane,'rows'))==1 && arrayOfMaterials(2)==7 && sum(ismember(ArrayOfPlanes(2:5),tmp_plane))~=4 && arrayOfMaterials(1)==7 && sum(ismember(ArrayOfPlanes(10:13),tmp_plane))~=4
-            index=[8,9,10,11,12,13,14,18,19,20,21,22,23,24,25,26];
+            index=[8,9,10,11,12,13,14,18];
             scatterer_index=index(randperm(numel(index),1));
-            materialLibrary.refreactiveindex(7)=materialLibrary.refreactiveindex(scatterer_index);
-            materialLibrary.absortionrate(7)=materialLibrary.absortionrate(scatterer_index);
+            materialLibrary.permittivity(7)=materialLibrary.permittivity(scatterer_index);
+            materialLibrary.conductivity(7)=materialLibrary.conductivity(scatterer_index);
             materialLibrary.roughness(7)=materialLibrary.roughness(scatterer_index);
             tmp_plane=[tmp_plane;ArrayOfPlanes(2:5)];
-            plane_mat=[plane_mat;materialLibrary.refreactiveindex(7) materialLibrary.absortionrate(7) materialLibrary.roughness(7)];
+            plane_mat=[plane_mat;materialLibrary.permittivity(7) materialLibrary.conductivity(7) materialLibrary.roughness(7)];
             [~,idx]= ismember(ArrayOfPlanes(6:9),tmp_plane, 'rows');
-            scatterer2_ref=plane_mat(idx,1);
-            scatterer2_abs=plane_mat(idx,2);
+            scatterer2_per=plane_mat(idx,1);
+            scatterer2_con=plane_mat(idx,2);
             scatterer2_rou=plane_mat(idx,3);
             scatterer_index=index(randperm(numel(index),1));
-            scatterer3_ref=materialLibrary.refreactiveindex(scatterer_index);
-            scatterer3_abs=materialLibrary.absortionrate(scatterer_index);
+            scatterer3_per=materialLibrary.permittivity(scatterer_index);
+            scatterer3_con=materialLibrary.conductivity(scatterer_index);
             scatterer3_rou=materialLibrary.roughness(scatterer_index);
             tmp_plane=[tmp_plane;ArrayOfPlanes(10:13)];
-            plane_mat=[plane_mat;scatterer3_ref scatterer3_abs scatterer3_rou];
+            plane_mat=[plane_mat;scatterer3_per scatterer3_con scatterer3_rou];
         elseif ~isempty(tmp_plane) && arrayOfMaterials(3)==7 && sum(ismember(ArrayOfPlanes(10:13),tmp_plane,'rows'))==1 && arrayOfMaterials(2)==7 && sum(ismember(ArrayOfPlanes(2:5),tmp_plane))~=4 && arrayOfMaterials(1)==7 && sum(ismember(ArrayOfPlanes(6:9),tmp_plane))~=4
-            index=[8,9,10,11,12,13,14,18,19,20,21,22,23,24,25,26];
+            index=[8,9,10,11,12,13,14,18];
             scatterer_index=index(randperm(numel(index),1));
-            materialLibrary.refreactiveindex(7)=materialLibrary.refreactiveindex(scatterer_index);
-            materialLibrary.absortionrate(7)=materialLibrary.absortionrate(scatterer_index);
+            materialLibrary.permittivity(7)=materialLibrary.permittivity(scatterer_index);
+            materialLibrary.conductivity(7)=materialLibrary.conductivity(scatterer_index);
             materialLibrary.roughness(7)=materialLibrary.roughness(scatterer_index);
             tmp_plane=[tmp_plane;ArrayOfPlanes(2:5)];
-            plane_mat=[plane_mat;materialLibrary.refreactiveindex(7) materialLibrary.absortionrate(7) materialLibrary.roughness(7)];
+            plane_mat=[plane_mat;materialLibrary.permittivity(7) materialLibrary.conductivity(7) materialLibrary.roughness(7)];
             scatterer_index=index(randperm(numel(index),1));
-            scatterer2_ref=materialLibrary.refreactiveindex(scatterer_index);
-            scatterer2_abs=materialLibrary.absortionrate(scatterer_index);
+            scatterer2_per=materialLibrary.permittivity(scatterer_index);
+            scatterer2_con=materialLibrary.conductivity(scatterer_index);
             scatterer2_rou=materialLibrary.roughness(scatterer_index);
             tmp_plane=[tmp_plane;ArrayOfPlanes(6:9)];
-            plane_mat=[plane_mat;scatterer2_ref scatterer2_abs scatterer2_rou];
+            plane_mat=[plane_mat;scatterer2_per scatterer2_con scatterer2_rou];
             [~,idx]= ismember(ArrayOfPlanes(10:13),tmp_plane, 'rows');
-            scatterer3_ref=plane_mat(idx,1);
-            scatterer3_abs=plane_mat(idx,2);
+            scatterer3_per=plane_mat(idx,1);
+            scatterer3_con=plane_mat(idx,2);
             scatterer3_rou=plane_mat(idx,3);
         elseif ~isempty(tmp_plane) && arrayOfMaterials(3)==7 && sum(ismember(ArrayOfPlanes(10:13),tmp_plane))~=4 && arrayOfMaterials(2)==7 && sum(ismember(ArrayOfPlanes(2:5),tmp_plane))~=4 && arrayOfMaterials(1)==7 && sum(ismember(ArrayOfPlanes(6:9),tmp_plane))~=4
-            index=[8,9,10,11,12,13,14,18,19,20,21,22,23,24,25,26];
+            index=[8,9,10,11,12,13,14,18];
             scatterer_index=index(randperm(numel(index),1));
-            materialLibrary.refreactiveindex(7)=materialLibrary.refreactiveindex(scatterer_index);
-            materialLibrary.absortionrate(7)=materialLibrary.absortionrate(scatterer_index);
+            materialLibrary.permittivity(7)=materialLibrary.permittivity(scatterer_index);
+            materialLibrary.conductivity(7)=materialLibrary.conductivity(scatterer_index);
             materialLibrary.roughness(7)=materialLibrary.roughness(scatterer_index);
             tmp_plane=[tmp_plane;ArrayOfPlanes(2:5)];
-            plane_mat=[plane_mat;materialLibrary.refreactiveindex(7) materialLibrary.absortionrate(7) materialLibrary.roughness(7)];
+            plane_mat=[plane_mat;materialLibrary.permittivity(7) materialLibrary.conductivity(7) materialLibrary.roughness(7)];
             scatterer_index=index(randperm(numel(index),1));
-            scatterer2_ref=materialLibrary.refreactiveindex(scatterer_index);
-            scatterer2_abs=materialLibrary.absortionrate(scatterer_index);
+            scatterer2_per=materialLibrary.permittivity(scatterer_index);
+            scatterer2_con=materialLibrary.conductivity(scatterer_index);
             scatterer2_rou=materialLibrary.roughness(scatterer_index);
             tmp_plane=[tmp_plane;ArrayOfPlanes(6:9)];
-            plane_mat=[plane_mat;scatterer2_ref scatterer2_abs scatterer2_rou];
+            plane_mat=[plane_mat;scatterer2_per scatterer2_con scatterer2_rou];
             scatterer_index=index(randperm(numel(index),1));
-            scatterer3_ref=materialLibrary.refreactiveindex(scatterer_index);
-            scatterer3_abs=materialLibrary.absortionrate(scatterer_index);
+            scatterer3_per=materialLibrary.permittivity(scatterer_index);
+            scatterer3_con=materialLibrary.conductivity(scatterer_index);
             scatterer3_rou=materialLibrary.roughness(scatterer_index);
             tmp_plane=[tmp_plane;ArrayOfPlanes(10:13)];
-            plane_mat=[plane_mat;scatterer3_ref scatterer3_abs scatterer3_rou];
+            plane_mat=[plane_mat;scatterer3_per scatterer3_con scatterer3_rou];
         end
     end
 else
     mat_indoor=6;
     for i=1:length(mat_indoor)
-        if materialLibrary.refreactiveindex(mat_indoor(i))==0
-            materialLibrary.refreactiveindex(mat_indoor(i))=1.7+0.5*rand;
-            materialLibrary.absortionrate(mat_indoor(i))=0.1*rand;
+        if materialLibrary.permittivity(mat_indoor(i))==0
+            materialLibrary.permittivity(mat_indoor(i))=1.7+0.5*rand;
+            materialLibrary.conductivity(mat_indoor(i))=0.1*rand;
             materialLibrary.roughness(mat_indoor(i))=0.1*rand;
         end
     end
     if length(arrayOfMaterials)==1
         if arrayOfMaterials==7 && sum(ismember(ArrayOfPlanes(2:5),tmp_plane))~=4
-            index=[8,9,10,11,12,13,14,18,19,20,21,22,23,24,25,26];
+            index=[8,9,10,11,12,13,14,18];
             scatterer_index=index(randperm(numel(index),1));
-            materialLibrary.refreactiveindex(7)=materialLibrary.refreactiveindex(scatterer_index);
-            materialLibrary.absortionrate(7)=materialLibrary.absortionrate(scatterer_index);
+            materialLibrary.permittivity(7)=materialLibrary.permittivity(scatterer_index);
+            materialLibrary.conductivity(7)=materialLibrary.conductivity(scatterer_index);
             materialLibrary.roughness(7)=materialLibrary.roughness(scatterer_index);
             tmp_plane=[tmp_plane;ArrayOfPlanes(2:5)];
-            plane_mat=[plane_mat;materialLibrary.refreactiveindex(7) materialLibrary.absortionrate(7) materialLibrary.roughness(7)];
+            plane_mat=[plane_mat;materialLibrary.permittivity(7) materialLibrary.conductivity(7) materialLibrary.roughness(7)];
         elseif ~isempty(tmp_plane) && arrayOfMaterials==7 && sum(ismember(ArrayOfPlanes(2:5),tmp_plane,'rows'))==1
             [~,idx]= ismember(ArrayOfPlanes(2:5),tmp_plane, 'rows');
-            materialLibrary.refreactiveindex(7)=plane_mat(idx,1);
-            materialLibrary.absortionrate(7)=plane_mat(idx,2);
+            materialLibrary.permittivity(7)=plane_mat(idx,1);
+            materialLibrary.conductivity(7)=plane_mat(idx,2);
             materialLibrary.roughness(7)=plane_mat(idx,3);
         end
     elseif length(arrayOfMaterials)==2
         if arrayOfMaterials(1)==7 && sum(ismember(ArrayOfPlanes(2:5),tmp_plane))~=4 && arrayOfMaterials(2)~=7
-            index=[8,9,10,11,12,13,14,18,19,20,21,22,23,24,25,26];
+            index=[8,9,10,11,12,13,14,18];
             scatterer_index=index(randperm(numel(index),1));
-            materialLibrary.refreactiveindex(7)=materialLibrary.refreactiveindex(scatterer_index);
-            materialLibrary.absortionrate(7)=materialLibrary.absortionrate(scatterer_index);
+            materialLibrary.permittivity(7)=materialLibrary.permittivity(scatterer_index);
+            materialLibrary.conductivity(7)=materialLibrary.conductivity(scatterer_index);
             materialLibrary.roughness(7)=materialLibrary.roughness(scatterer_index);
             tmp_plane=[tmp_plane;ArrayOfPlanes(2:5)];
-            plane_mat=[plane_mat;materialLibrary.refreactiveindex(7) materialLibrary.absortionrate(7) materialLibrary.roughness(7)];
+            plane_mat=[plane_mat;materialLibrary.permittivity(7) materialLibrary.conductivity(7) materialLibrary.roughness(7)];
         elseif ~isempty(tmp_plane) && arrayOfMaterials(1)==7 && sum(ismember(ArrayOfPlanes(2:5),tmp_plane,'rows'))==1 && arrayOfMaterials(2)~=7
             [~,idx]= ismember(ArrayOfPlanes(2:5),tmp_plane, 'rows');
-            materialLibrary.refreactiveindex(7)=plane_mat(idx,1);
-            materialLibrary.absortionrate(7)=plane_mat(idx,2);
+            materialLibrary.permittivity(7)=plane_mat(idx,1);
+            materialLibrary.conductivity(7)=plane_mat(idx,2);
             materialLibrary.roughness(7)=plane_mat(idx,3);
         elseif arrayOfMaterials(2)==7 && sum(ismember(ArrayOfPlanes(6:9),tmp_plane))~=4 && arrayOfMaterials(1)~=7
-            index=[8,9,10,11,12,13,14,18,19,20,21,22,23,24,25,26];
+            index=[8,9,10,11,12,13,14,18];
             scatterer_index=index(randperm(numel(index),1));
-            materialLibrary.refreactiveindex(7)=materialLibrary.refreactiveindex(scatterer_index);
-            materialLibrary.absortionrate(7)=materialLibrary.absortionrate(scatterer_index);
+            materialLibrary.permittivity(7)=materialLibrary.permittivity(scatterer_index);
+            materialLibrary.conductivity(7)=materialLibrary.conductivity(scatterer_index);
             materialLibrary.roughness(7)=materialLibrary.roughness(scatterer_index);
             tmp_plane=[tmp_plane;ArrayOfPlanes(6:9)];
-            plane_mat=[plane_mat;materialLibrary.refreactiveindex(7) materialLibrary.absortionrate(7) materialLibrary.roughness(7)];
+            plane_mat=[plane_mat;materialLibrary.permittivity(7) materialLibrary.conductivity(7) materialLibrary.roughness(7)];
         elseif ~isempty(tmp_plane) && arrayOfMaterials(2)==7 && sum(ismember(ArrayOfPlanes(6:9),tmp_plane,'rows'))==1  && arrayOfMaterials(1)~=7
             [~,idx]= ismember(ArrayOfPlanes(6:9),tmp_plane, 'rows');
-            materialLibrary.refreactiveindex(7)=plane_mat(idx,1);
-            materialLibrary.absortionrate(7)=plane_mat(idx,2);
+            materialLibrary.permittivity(7)=plane_mat(idx,1);
+            materialLibrary.conductivity(7)=plane_mat(idx,2);
             materialLibrary.roughness(7)=plane_mat(idx,3);
         elseif arrayOfMaterials(1)==7 && arrayOfMaterials(2)==7 && sum(ismember(ArrayOfPlanes(2:5),tmp_plane))~=4 && (~isempty(tmp_plane) && sum(ismember(ArrayOfPlanes(6:9),tmp_plane,'rows'))==1)
-            index=[8,9,10,11,12,13,14,18,19,20,21,22,23,24,25,26];
+            index=[8,9,10,11,12,13,14,18];
             scatterer_index=index(randperm(numel(index),1));
-            materialLibrary.refreactiveindex(7)=materialLibrary.refreactiveindex(scatterer_index);
-            materialLibrary.absortionrate(7)=materialLibrary.absortionrate(scatterer_index);
+            materialLibrary.permittivity(7)=materialLibrary.permittivity(scatterer_index);
+            materialLibrary.conductivity(7)=materialLibrary.conductivity(scatterer_index);
             materialLibrary.roughness(7)=materialLibrary.roughness(scatterer_index);
             tmp_plane=[tmp_plane;ArrayOfPlanes(2:5)];
-            plane_mat=[plane_mat;materialLibrary.refreactiveindex(7) materialLibrary.absortionrate(7) materialLibrary.roughness(7)];
+            plane_mat=[plane_mat;materialLibrary.permittivity(7) materialLibrary.conductivity(7) materialLibrary.roughness(7)];
             [~,scatterer2_index]= ismember(ArrayOfPlanes(6:9),tmp_plane, 'rows');
-            scatterer2_ref=plane_mat(scatterer2_index,1);
-            scatterer2_abs=plane_mat(scatterer2_index,2);
+            scatterer2_per=plane_mat(scatterer2_index,1);
+            scatterer2_con=plane_mat(scatterer2_index,2);
             scatterer2_rou=plane_mat(scatterer2_index,3);
         elseif arrayOfMaterials(1)==7 && arrayOfMaterials(2)==7 && sum(ismember(ArrayOfPlanes(6:9),tmp_plane))~=4 && (~isempty(tmp_plane) && sum(ismember(ArrayOfPlanes(2:5),tmp_plane,'rows'))==1)
             [~,idx]= ismember(ArrayOfPlanes(2:5),tmp_plane, 'rows');
-            materialLibrary.refreactiveindex(7)=plane_mat(idx,1);
-            materialLibrary.absortionrate(7)=plane_mat(idx,2);
+            materialLibrary.permittivity(7)=plane_mat(idx,1);
+            materialLibrary.conductivity(7)=plane_mat(idx,2);
             materialLibrary.roughness(7)=plane_mat(idx,3);
-            index=[8,9,10,11,12,13,14,18,19,20,21,22,23,24,25,26];
+            index=[8,9,10,11,12,13,14,18];
             scatterer2_index=index(randperm(numel(index),1));
-            scatterer2_ref=materialLibrary.refreactiveindex(scatterer2_index);
-            scatterer2_abs=materialLibrary.absortionrate(scatterer2_index);
+            scatterer2_per=materialLibrary.permittivity(scatterer2_index);
+            scatterer2_con=materialLibrary.conductivity(scatterer2_index);
             scatterer2_rou=materialLibrary.roughness(scatterer2_index);
             tmp_plane=[tmp_plane;ArrayOfPlanes(6:9)];
-            plane_mat=[plane_mat;scatterer2_ref materialLibrary.absortionrate(7) materialLibrary.roughness(7)];
+            plane_mat=[plane_mat;scatterer2_per materialLibrary.conductivity(7) materialLibrary.roughness(7)];
         elseif arrayOfMaterials(1)==7 && arrayOfMaterials(2)==7 && sum(ismember(ArrayOfPlanes(2:5),tmp_plane))~=4 && sum(ismember(ArrayOfPlanes(6:9),tmp_plane))~=4
-            index=[8,9,10,11,12,13,14,18,19,20,21,22,23,24,25,26];
+            index=[8,9,10,11,12,13,14,18];
             scatterer_index=index(randperm(numel(index),1));
-            materialLibrary.refreactiveindex(7)=materialLibrary.refreactiveindex(scatterer_index);
-            materialLibrary.absortionrate(7)=materialLibrary.absortionrate(scatterer_index);
+            materialLibrary.permittivity(7)=materialLibrary.permittivity(scatterer_index);
+            materialLibrary.conductivity(7)=materialLibrary.conductivity(scatterer_index);
             materialLibrary.roughness(7)=materialLibrary.roughness(scatterer_index);
             tmp_plane=[tmp_plane;ArrayOfPlanes(2:5)];
-            plane_mat=[plane_mat;materialLibrary.refreactiveindex(7) materialLibrary.absortionrate(7) materialLibrary.roughness(7)];
+            plane_mat=[plane_mat;materialLibrary.permittivity(7) materialLibrary.conductivity(7) materialLibrary.roughness(7)];
             scatterer2_index=index(randperm(numel(index),1));
-            scatterer2_ref=materialLibrary.refreactiveindex(scatterer2_index);
-            scatterer2_abs=materialLibrary.absortionrate(scatterer2_index);
+            scatterer2_per=materialLibrary.permittivity(scatterer2_index);
+            scatterer2_con=materialLibrary.conductivity(scatterer2_index);
             scatterer2_rou=materialLibrary.roughness(scatterer2_index);
             tmp_plane=[tmp_plane;ArrayOfPlanes(6:9)];
-            plane_mat=[plane_mat;scatterer2_ref scatterer2_abs scatterer2_rou];
+            plane_mat=[plane_mat;scatterer2_per scatterer2_con scatterer2_rou];
         elseif arrayOfMaterials(1)==7 && arrayOfMaterials(2)==7 && (~isempty(tmp_plane) && sum(ismember(ArrayOfPlanes(6:9),tmp_plane,'rows'))==1) && (~isempty(tmp_plane) && sum(ismember(ArrayOfPlanes(2:5),tmp_plane,'rows'))==1)
             [~,idx]= ismember(ArrayOfPlanes(2:5),tmp_plane, 'rows');
-            materialLibrary.refreactiveindex(7)=plane_mat(idx,1);
-            materialLibrary.absortionrate(7)=plane_mat(idx,2);
+            materialLibrary.permittivity(7)=plane_mat(idx,1);
+            materialLibrary.conductivity(7)=plane_mat(idx,2);
             materialLibrary.roughness(7)=plane_mat(idx,3);
             [~,idx]= ismember(ArrayOfPlanes(6:9),tmp_plane, 'rows'); 
-            scatterer2_ref=plane_mat(idx,1);
-            scatterer2_abs=plane_mat(idx,2);
+            scatterer2_per=plane_mat(idx,1);
+            scatterer2_con=plane_mat(idx,2);
             scatterer2_rou=plane_mat(idx,3);
         end
     elseif length(arrayOfMaterials)==3
         if arrayOfMaterials(1)==7 && sum(ismember(ArrayOfPlanes(2:5),tmp_plane))~=4 && arrayOfMaterials(2)~=7 && arrayOfMaterials(3)~=7
-            index=[8,9,10,11,12,13,14,18,19,20,21,22,23,24,25,26];
+            index=[8,9,10,11,12,13,14,18];
             scatterer_index=index(randperm(numel(index),1));
-            materialLibrary.refreactiveindex(7)=materialLibrary.refreactiveindex(scatterer_index);
-            materialLibrary.absortionrate(7)=materialLibrary.absortionrate(scatterer_index);
+            materialLibrary.permittivity(7)=materialLibrary.permittivity(scatterer_index);
+            materialLibrary.conductivity(7)=materialLibrary.conductivity(scatterer_index);
             materialLibrary.roughness(7)=materialLibrary.roughness(scatterer_index);
             tmp_plane=[tmp_plane;ArrayOfPlanes(2:5)];
-            plane_mat=[plane_mat;materialLibrary.refreactiveindex(7) materialLibrary.absortionrate(7) materialLibrary.roughness(7)];
+            plane_mat=[plane_mat;materialLibrary.permittivity(7) materialLibrary.conductivity(7) materialLibrary.roughness(7)];
         elseif ~isempty(tmp_plane) && arrayOfMaterials(1)==7 && sum(ismember(ArrayOfPlanes(2:5),tmp_plane,'rows'))==1 && arrayOfMaterials(2)~=7 && arrayOfMaterials(3)~=7
             [~,idx]= ismember(ArrayOfPlanes(2:5),tmp_plane, 'rows');
-            materialLibrary.refreactiveindex(7)=plane_mat(idx,1);
-            materialLibrary.absortionrate(7)=plane_mat(idx,2);
+            materialLibrary.permittivity(7)=plane_mat(idx,1);
+            materialLibrary.conductivity(7)=plane_mat(idx,2);
             materialLibrary.roughness(7)=plane_mat(idx,3);
         elseif arrayOfMaterials(2)==7 && sum(ismember(ArrayOfPlanes(6:9),tmp_plane))~=4 && arrayOfMaterials(1)~=7 && arrayOfMaterials(3)~=7
-            index=[8,9,10,11,12,13,14,18,19,20,21,22,23,24,25,26];
+            index=[8,9,10,11,12,13,14,18];
             scatterer_index=index(randperm(numel(index),1));
-            materialLibrary.refreactiveindex(7)=materialLibrary.refreactiveindex(scatterer_index);
-            materialLibrary.absortionrate(7)=materialLibrary.absortionrate(scatterer_index);
+            materialLibrary.permittivity(7)=materialLibrary.permittivity(scatterer_index);
+            materialLibrary.conductivity(7)=materialLibrary.conductivity(scatterer_index);
             materialLibrary.roughness(7)=materialLibrary.roughness(scatterer_index);
             tmp_plane=[tmp_plane;ArrayOfPlanes(6:9)];
-            plane_mat=[plane_mat;materialLibrary.refreactiveindex(7) materialLibrary.absortionrate(7) materialLibrary.roughness(7)];
+            plane_mat=[plane_mat;materialLibrary.permittivity(7) materialLibrary.conductivity(7) materialLibrary.roughness(7)];
         elseif ~isempty(tmp_plane) && arrayOfMaterials(2)==7 && sum(ismember(ArrayOfPlanes(6:9),tmp_plane,'rows'))==1  && arrayOfMaterials(1)~=7 && arrayOfMaterials(3)~=7
             [~,idx]= ismember(ArrayOfPlanes(6:9),tmp_plane, 'rows');
-            materialLibrary.refreactiveindex(7)=plane_mat(idx,1);
-            materialLibrary.absortionrate(7)=plane_mat(idx,2);
+            materialLibrary.permittivity(7)=plane_mat(idx,1);
+            materialLibrary.conductivity(7)=plane_mat(idx,2);
             materialLibrary.roughness(7)=plane_mat(idx,3);
         elseif arrayOfMaterials(1)==7 && arrayOfMaterials(2)==7 && sum(ismember(ArrayOfPlanes(2:5),tmp_plane))~=4 && (~isempty(tmp_plane) && sum(ismember(ArrayOfPlanes(6:9),tmp_plane,'rows'))==1) && arrayOfMaterials(3)~=7
-            index=[8,9,10,11,12,13,14,18,19,20,21,22,23,24,25,26];
+            index=[8,9,10,11,12,13,14,18];
             scatterer_index=index(randperm(numel(index),1));
-            materialLibrary.refreactiveindex(7)=materialLibrary.refreactiveindex(scatterer_index);
-            materialLibrary.absortionrate(7)=materialLibrary.absortionrate(scatterer_index);
+            materialLibrary.permittivity(7)=materialLibrary.permittivity(scatterer_index);
+            materialLibrary.conductivity(7)=materialLibrary.conductivity(scatterer_index);
             materialLibrary.roughness(7)=materialLibrary.roughness(scatterer_index);
             tmp_plane=[tmp_plane;ArrayOfPlanes(2:5)];
-            plane_mat=[plane_mat;materialLibrary.refreactiveindex(7) materialLibrary.absortionrate(7) materialLibrary.roughness(7)];
+            plane_mat=[plane_mat;materialLibrary.permittivity(7) materialLibrary.conductivity(7) materialLibrary.roughness(7)];
             [~,scatterer2_index]= ismember(ArrayOfPlanes(6:9),tmp_plane, 'rows');
-            scatterer2_ref=plane_mat(scatterer2_index,1);
-            scatterer2_abs=plane_mat(scatterer2_index,2);
+            scatterer2_per=plane_mat(scatterer2_index,1);
+            scatterer2_con=plane_mat(scatterer2_index,2);
             scatterer2_rou=plane_mat(scatterer2_index,3);
         elseif arrayOfMaterials(1)==7 && arrayOfMaterials(2)==7 && sum(ismember(ArrayOfPlanes(6:9),tmp_plane))~=4 && (~isempty(tmp_plane) && sum(ismember(ArrayOfPlanes(2:5),tmp_plane,'rows'))==1) && arrayOfMaterials(3)~=7
             [~,idx]= ismember(ArrayOfPlanes(2:5),tmp_plane, 'rows');
-            materialLibrary.refreactiveindex(7)=plane_mat(idx,1);
-            materialLibrary.absortionrate(7)=plane_mat(idx,2);
+            materialLibrary.permittivity(7)=plane_mat(idx,1);
+            materialLibrary.conductivity(7)=plane_mat(idx,2);
             materialLibrary.roughness(7)=plane_mat(idx,3);
-            index=[8,9,10,11,12,13,14,18,19,20,21,22,23,24,25,26];
+            index=[8,9,10,11,12,13,14,18];
             scatterer2_index=index(randperm(numel(index),1));
-            scatterer2_ref=materialLibrary.refreactiveindex(scatterer2_index);
-            scatterer2_abs=materialLibrary.absortionrate(scatterer2_index);
+            scatterer2_per=materialLibrary.permittivity(scatterer2_index);
+            scatterer2_con=materialLibrary.conductivity(scatterer2_index);
             scatterer2_rou=materialLibrary.roughness(scatterer2_index);
             tmp_plane=[tmp_plane;ArrayOfPlanes(6:9)];
-            plane_mat=[plane_mat;scatterer2_ref materialLibrary.absortionrate(7) materialLibrary.roughness(7)];
+            plane_mat=[plane_mat;scatterer2_per materialLibrary.conductivity(7) materialLibrary.roughness(7)];
         elseif arrayOfMaterials(1)==7 && arrayOfMaterials(2)==7 && sum(ismember(ArrayOfPlanes(2:5),tmp_plane))~=4 && sum(ismember(ArrayOfPlanes(6:9),tmp_plane))~=4 && arrayOfMaterials(3)~=7
-            index=[8,9,10,11,12,13,14,18,19,20,21,22,23,24,25,26];
+            index=[8,9,10,11,12,13,14,18];
             scatterer_index=index(randperm(numel(index),1));
-            materialLibrary.refreactiveindex(7)=materialLibrary.refreactiveindex(scatterer_index);
-            materialLibrary.absortionrate(7)=materialLibrary.absortionrate(scatterer_index);
+            materialLibrary.permittivity(7)=materialLibrary.permittivity(scatterer_index);
+            materialLibrary.conductivity(7)=materialLibrary.conductivity(scatterer_index);
             materialLibrary.roughness(7)=materialLibrary.roughness(scatterer_index);
             tmp_plane=[tmp_plane;ArrayOfPlanes(2:5)];
-            plane_mat=[plane_mat;materialLibrary.refreactiveindex(7) materialLibrary.absortionrate(7) materialLibrary.roughness(7)];
+            plane_mat=[plane_mat;materialLibrary.permittivity(7) materialLibrary.conductivity(7) materialLibrary.roughness(7)];
             scatterer2_index=index(randperm(numel(index),1));
-            scatterer2_ref=materialLibrary.refreactiveindex(scatterer2_index);
-            scatterer2_abs=materialLibrary.absortionrate(scatterer2_index);
+            scatterer2_per=materialLibrary.permittivity(scatterer2_index);
+            scatterer2_con=materialLibrary.conductivity(scatterer2_index);
             scatterer2_rou=materialLibrary.roughness(scatterer2_index);
             tmp_plane=[tmp_plane;ArrayOfPlanes(6:9)];
-            plane_mat=[plane_mat;scatterer2_ref scatterer2_abs scatterer2_rou];
+            plane_mat=[plane_mat;scatterer2_per scatterer2_con scatterer2_rou];
         elseif arrayOfMaterials(1)==7 && arrayOfMaterials(2)==7 && (~isempty(tmp_plane) && sum(ismember(ArrayOfPlanes(6:9),tmp_plane,'rows'))==1) && (~isempty(tmp_plane) && sum(ismember(ArrayOfPlanes(2:5),tmp_plane,'rows'))==1) && arrayOfMaterials(3)~=7
             [~,idx]= ismember(ArrayOfPlanes(2:5),tmp_plane, 'rows');
-            materialLibrary.refreactiveindex(7)=plane_mat(idx,1);
-            materialLibrary.absortionrate(7)=plane_mat(idx,2);
+            materialLibrary.permittivity(7)=plane_mat(idx,1);
+            materialLibrary.conductivity(7)=plane_mat(idx,2);
             materialLibrary.roughness(7)=plane_mat(idx,3);
             [~,idx]= ismember(ArrayOfPlanes(6:9),tmp_plane, 'rows'); 
-            scatterer2_ref=plane_mat(idx,1);
-            scatterer2_abs=plane_mat(idx,2);
+            scatterer2_per=plane_mat(idx,1);
+            scatterer2_con=plane_mat(idx,2);
             scatterer2_rou=plane_mat(idx,3);
         elseif arrayOfMaterials(2)==7 && sum(ismember(ArrayOfPlanes(6:9),tmp_plane))~=4 && arrayOfMaterials(1)~=7 && arrayOfMaterials(3)==7 && sum(ismember(ArrayOfPlanes(10:13),tmp_plane))~=4
-            index=[8,9,10,11,12,13,14,18,19,20,21,22,23,24,25,26];
+            index=[8,9,10,11,12,13,14,18];
             scatterer_index=index(randperm(numel(index),1));
-            materialLibrary.refreactiveindex(7)=materialLibrary.refreactiveindex(scatterer_index);
-            materialLibrary.absortionrate(7)=materialLibrary.absortionrate(scatterer_index);
+            materialLibrary.permittivity(7)=materialLibrary.permittivity(scatterer_index);
+            materialLibrary.conductivity(7)=materialLibrary.conductivity(scatterer_index);
             materialLibrary.roughness(7)=materialLibrary.roughness(scatterer_index);
             tmp_plane=[tmp_plane;ArrayOfPlanes(6:9)];
-            plane_mat=[plane_mat;materialLibrary.refreactiveindex(7) materialLibrary.absortionrate(7) materialLibrary.roughness(7)];
+            plane_mat=[plane_mat;materialLibrary.permittivity(7) materialLibrary.conductivity(7) materialLibrary.roughness(7)];
             scatterer2_index=index(randperm(numel(index),1));
-            scatterer2_ref=materialLibrary.refreactiveindex(scatterer2_index);
-            scatterer2_abs=materialLibrary.absortionrate(scatterer2_index);
+            scatterer2_per=materialLibrary.permittivity(scatterer2_index);
+            scatterer2_con=materialLibrary.conductivity(scatterer2_index);
             scatterer2_rou=materialLibrary.roughness(scatterer2_index);
             tmp_plane=[tmp_plane;ArrayOfPlanes(10:13)];
-            plane_mat=[plane_mat;scatterer2_ref scatterer2_abs scatterer2_rou];
+            plane_mat=[plane_mat;scatterer2_per scatterer2_con scatterer2_rou];
         elseif ~isempty(tmp_plane) && arrayOfMaterials(2)==7 && sum(ismember(ArrayOfPlanes(6:9),tmp_plane,'rows'))==1 && arrayOfMaterials(1)~=7 && arrayOfMaterials(3)==7 && sum(ismember(ArrayOfPlanes(10:13),tmp_plane))~=4
             [~,idx]= ismember(ArrayOfPlanes(6:9),tmp_plane, 'rows');
-            materialLibrary.refreactiveindex(7)=plane_mat(idx,1);
-            materialLibrary.absortionrate(7)=plane_mat(idx,2);
+            materialLibrary.permittivity(7)=plane_mat(idx,1);
+            materialLibrary.conductivity(7)=plane_mat(idx,2);
             materialLibrary.roughness(7)=plane_mat(idx,3);
-            index=[8,9,10,11,12,13,14,18,19,20,21,22,23,24,25,26];
+            index=[8,9,10,11,12,13,14,18];
             scatterer2_index=index(randperm(numel(index),1));
-            scatterer2_ref=materialLibrary.refreactiveindex(scatterer2_index);
-            scatterer2_abs=materialLibrary.absortionrate(scatterer2_index);
+            scatterer2_per=materialLibrary.permittivity(scatterer2_index);
+            scatterer2_con=materialLibrary.conductivity(scatterer2_index);
             scatterer2_rou=materialLibrary.roughness(scatterer2_index);
             tmp_plane=[tmp_plane;ArrayOfPlanes(10:13)];
-            plane_mat=[plane_mat;scatterer2_ref scatterer2_abs scatterer2_rou];
+            plane_mat=[plane_mat;scatterer2_per scatterer2_con scatterer2_rou];
         elseif ~isempty(tmp_plane) && arrayOfMaterials(2)==7 && sum(ismember(ArrayOfPlanes(6:9),tmp_plane,'rows'))==1 && arrayOfMaterials(1)~=7 && arrayOfMaterials(3)==7 && sum(ismember(ArrayOfPlanes(10:13),tmp_plane,'rows'))==1
             [~,idx]= ismember(ArrayOfPlanes(6:9),tmp_plane, 'rows');
-            materialLibrary.refreactiveindex(7)=plane_mat(idx,1);
-            materialLibrary.absortionrate(7)=plane_mat(idx,2);
+            materialLibrary.permittivity(7)=plane_mat(idx,1);
+            materialLibrary.conductivity(7)=plane_mat(idx,2);
             materialLibrary.roughness(7)=plane_mat(idx,3);
             [~,idx]= ismember(ArrayOfPlanes(10:13),tmp_plane, 'rows');
-            scatterer2_ref=plane_mat(idx,1);
-            scatterer2_abs=plane_mat(idx,2);
+            scatterer2_per=plane_mat(idx,1);
+            scatterer2_con=plane_mat(idx,2);
             scatterer2_rou=plane_mat(idx,3);
         elseif ~isempty(tmp_plane) && arrayOfMaterials(2)==7 && sum(ismember(ArrayOfPlanes(6:9),tmp_plane))~=4 && arrayOfMaterials(1)~=7 && arrayOfMaterials(3)==7 && sum(ismember(ArrayOfPlanes(10:13),tmp_plane,'rows'))==1
-            index=[8,9,10,11,12,13,14,18,19,20,21,22,23,24,25,26];
+            index=[8,9,10,11,12,13,14,18];
             scatterer_index=index(randperm(numel(index),1));
-            materialLibrary.refreactiveindex(7)=materialLibrary.refreactiveindex(scatterer_index);
-            materialLibrary.absortionrate(7)=materialLibrary.absortionrate(scatterer_index);
+            materialLibrary.permittivity(7)=materialLibrary.permittivity(scatterer_index);
+            materialLibrary.conductivity(7)=materialLibrary.conductivity(scatterer_index);
             materialLibrary.roughness(7)=materialLibrary.roughness(scatterer_index);
             tmp_plane=[tmp_plane;ArrayOfPlanes(6:9)];
-            plane_mat=[plane_mat;materialLibrary.refreactiveindex(7) materialLibrary.absortionrate(7) materialLibrary.roughness(7)];
+            plane_mat=[plane_mat;materialLibrary.permittivity(7) materialLibrary.conductivity(7) materialLibrary.roughness(7)];
             [~,idx]= ismember(ArrayOfPlanes(10:13),tmp_plane, 'rows');
-            scatterer2_ref=plane_mat(idx,1);
-            scatterer2_abs=plane_mat(idx,2);
+            scatterer2_per=plane_mat(idx,1);
+            scatterer2_con=plane_mat(idx,2);
             scatterer2_rou=plane_mat(idx,3);
         elseif ~isempty(tmp_plane) && arrayOfMaterials(2)~=7 && arrayOfMaterials(1)~=7 && arrayOfMaterials(3)==7 && sum(ismember(ArrayOfPlanes(10:13),tmp_plane))~=4
-            index=[8,9,10,11,12,13,14,18,19,20,21,22,23,24,25,26];
+            index=[8,9,10,11,12,13,14,18];
             scatterer_index=index(randperm(numel(index),1));
-            materialLibrary.refreactiveindex(7)=materialLibrary.refreactiveindex(scatterer_index);
-            materialLibrary.absortionrate(7)=materialLibrary.absortionrate(scatterer_index);
+            materialLibrary.permittivity(7)=materialLibrary.permittivity(scatterer_index);
+            materialLibrary.conductivity(7)=materialLibrary.conductivity(scatterer_index);
             materialLibrary.roughness(7)=materialLibrary.roughness(scatterer_index);
             tmp_plane=[tmp_plane;ArrayOfPlanes(10:13)];
-            plane_mat=[plane_mat;materialLibrary.refreactiveindex(7) materialLibrary.absortionrate(7) materialLibrary.roughness(7)];
+            plane_mat=[plane_mat;materialLibrary.permittivity(7) materialLibrary.conductivity(7) materialLibrary.roughness(7)];
         elseif ~isempty(tmp_plane) && arrayOfMaterials(2)~=7 && arrayOfMaterials(1)~=7 && arrayOfMaterials(3)==7 && sum(ismember(ArrayOfPlanes(10:13),tmp_plane,'rows'))==1
             [~,idx]= ismember(ArrayOfPlanes(10:13),tmp_plane, 'rows');
-            materialLibrary.refreactiveindex(7)=plane_mat(idx,1);
-            materialLibrary.absortionrate(7)=plane_mat(idx,2);
+            materialLibrary.permittivity(7)=plane_mat(idx,1);
+            materialLibrary.conductivity(7)=plane_mat(idx,2);
             materialLibrary.roughness(7)=plane_mat(idx,3);
         elseif ~isempty(tmp_plane) && arrayOfMaterials(3)==7 && sum(ismember(ArrayOfPlanes(10:13),tmp_plane,'rows'))==1 && arrayOfMaterials(2)==7 && sum(ismember(ArrayOfPlanes(6:9),tmp_plane,'rows'))==1 && arrayOfMaterials(1)==7 && sum(ismember(ArrayOfPlanes(2:5),tmp_plane,'rows'))==1
             [~,idx]= ismember(ArrayOfPlanes(2:5),tmp_plane, 'rows');
-            materialLibrary.refreactiveindex(7)=plane_mat(idx,1);
-            materialLibrary.absortionrate(7)=plane_mat(idx,2);
+            materialLibrary.permittivity(7)=plane_mat(idx,1);
+            materialLibrary.conductivity(7)=plane_mat(idx,2);
             materialLibrary.roughness(7)=plane_mat(idx,3);
             [~,idx]= ismember(ArrayOfPlanes(6:9),tmp_plane, 'rows');
-            scatterer2_ref=plane_mat(idx,1);
-            scatterer2_abs=plane_mat(idx,2);
+            scatterer2_per=plane_mat(idx,1);
+            scatterer2_con=plane_mat(idx,2);
             scatterer2_rou=plane_mat(idx,3);
             [~,idx]= ismember(ArrayOfPlanes(10:13),tmp_plane, 'rows');
-            scatterer3_ref=plane_mat(idx,1);
-            scatterer3_abs=plane_mat(idx,2);
+            scatterer3_per=plane_mat(idx,1);
+            scatterer3_con=plane_mat(idx,2);
             scatterer3_rou=plane_mat(idx,3);
         elseif ~isempty(tmp_plane) && arrayOfMaterials(3)==7 && sum(ismember(ArrayOfPlanes(10:13),tmp_plane,'rows'))==1 && arrayOfMaterials(2)==7 && sum(ismember(ArrayOfPlanes(6:9),tmp_plane,'rows'))==1 && arrayOfMaterials(1)==7 && sum(ismember(ArrayOfPlanes(2:5),tmp_plane))~=4
-            index=[8,9,10,11,12,13,14,18,19,20,21,22,23,24,25,26];
+            index=[8,9,10,11,12,13,14,18];
             scatterer_index=index(randperm(numel(index),1));
-            materialLibrary.refreactiveindex(7)=materialLibrary.refreactiveindex(scatterer_index);
-            materialLibrary.absortionrate(7)=materialLibrary.absortionrate(scatterer_index);
+            materialLibrary.permittivity(7)=materialLibrary.permittivity(scatterer_index);
+            materialLibrary.conductivity(7)=materialLibrary.conductivity(scatterer_index);
             materialLibrary.roughness(7)=materialLibrary.roughness(scatterer_index);
             tmp_plane=[tmp_plane;ArrayOfPlanes(2:5)];
-            plane_mat=[plane_mat;materialLibrary.refreactiveindex(7) materialLibrary.absortionrate(7) materialLibrary.roughness(7)];
+            plane_mat=[plane_mat;materialLibrary.permittivity(7) materialLibrary.conductivity(7) materialLibrary.roughness(7)];
             [~,idx]= ismember(ArrayOfPlanes(6:9),tmp_plane, 'rows');
-            scatterer2_ref=plane_mat(idx,1);
-            scatterer2_abs=plane_mat(idx,2);
+            scatterer2_per=plane_mat(idx,1);
+            scatterer2_con=plane_mat(idx,2);
             scatterer2_rou=plane_mat(idx,3);
             [~,idx]= ismember(ArrayOfPlanes(10:13),tmp_plane, 'rows');
-            scatterer3_ref=plane_mat(idx,1);
-            scatterer3_abs=plane_mat(idx,2);
+            scatterer3_per=plane_mat(idx,1);
+            scatterer3_con=plane_mat(idx,2);
             scatterer3_rou=plane_mat(idx,3);
         elseif ~isempty(tmp_plane) && arrayOfMaterials(3)==7 && sum(ismember(ArrayOfPlanes(10:13),tmp_plane,'rows'))==1 && arrayOfMaterials(2)==7 && sum(ismember(ArrayOfPlanes(2:5),tmp_plane,'rows'))==1 && arrayOfMaterials(1)==7 && sum(ismember(ArrayOfPlanes(6:9),tmp_plane))~=4
             [~,idx]= ismember(ArrayOfPlanes(2:5),tmp_plane, 'rows');
-            materialLibrary.refreactiveindex(7)=plane_mat(idx,1);
-            materialLibrary.absortionrate(7)=plane_mat(idx,2);
+            materialLibrary.permittivity(7)=plane_mat(idx,1);
+            materialLibrary.conductivity(7)=plane_mat(idx,2);
             materialLibrary.roughness(7)=plane_mat(idx,3);
-            index=[8,9,10,11,12,13,14,18,19,20,21,22,23,24,25,26];
+            index=[8,9,10,11,12,13,14,18];
             scatterer_index=index(randperm(numel(index),1));
-            scatterer2_ref=materialLibrary.refreactiveindex(scatterer_index);
-            scatterer2_abs=materialLibrary.absortionrate(scatterer_index);
+            scatterer2_per=materialLibrary.permittivity(scatterer_index);
+            scatterer2_con=materialLibrary.conductivity(scatterer_index);
             scatterer2_rou=materialLibrary.roughness(scatterer_index);
             tmp_plane=[tmp_plane;ArrayOfPlanes(6:9)];
-            plane_mat=[plane_mat;scatterer2_ref scatterer2_abs scatterer2_rou];
+            plane_mat=[plane_mat;scatterer2_per scatterer2_con scatterer2_rou];
             [~,idx]= ismember(ArrayOfPlanes(10:13),tmp_plane, 'rows');
-            scatterer3_ref=plane_mat(idx,1);
-            scatterer3_abs=plane_mat(idx,2);
+            scatterer3_per=plane_mat(idx,1);
+            scatterer3_con=plane_mat(idx,2);
             scatterer3_rou=plane_mat(idx,3);
         elseif ~isempty(tmp_plane) && arrayOfMaterials(3)==7 && sum(ismember(ArrayOfPlanes(6:9),tmp_plane,'rows'))==1 && arrayOfMaterials(2)==7 && sum(ismember(ArrayOfPlanes(2:5),tmp_plane,'rows'))==1 && arrayOfMaterials(1)==7 && sum(ismember(ArrayOfPlanes(10:13),tmp_plane))~=4
             [~,idx]= ismember(ArrayOfPlanes(2:5),tmp_plane, 'rows');
-            materialLibrary.refreactiveindex(7)=plane_mat(idx,1);
-            materialLibrary.absortionrate(7)=plane_mat(idx,2);
+            materialLibrary.permittivity(7)=plane_mat(idx,1);
+            materialLibrary.conductivity(7)=plane_mat(idx,2);
             materialLibrary.roughness(7)=plane_mat(idx,3);
             [~,idx]= ismember(ArrayOfPlanes(6:9),tmp_plane, 'rows');
-            scatterer2_ref=plane_mat(idx,1);
-            scatterer2_abs=plane_mat(idx,2);
+            scatterer2_per=plane_mat(idx,1);
+            scatterer2_con=plane_mat(idx,2);
             scatterer2_rou=plane_mat(idx,3);
-            index=[8,9,10,11,12,13,14,18,19,20,21,22,23,24,25,26];
+            index=[8,9,10,11,12,13,14,18];
             scatterer_index=index(randperm(numel(index),1));
-            scatterer3_ref=materialLibrary.refreactiveindex(scatterer_index);
-            scatterer3_abs=materialLibrary.absortionrate(scatterer_index);
+            scatterer3_per=materialLibrary.permittivity(scatterer_index);
+            scatterer3_con=materialLibrary.conductivity(scatterer_index);
             scatterer3_rou=materialLibrary.roughness(scatterer_index);
             tmp_plane=[tmp_plane;ArrayOfPlanes(10:13)];
-            plane_mat=[plane_mat;scatterer3_ref scatterer3_abs scatterer3_rou];
+            plane_mat=[plane_mat;scatterer3_per scatterer3_con scatterer3_rou];
         elseif ~isempty(tmp_plane) && arrayOfMaterials(3)==7 && sum(ismember(ArrayOfPlanes(6:9),tmp_plane,'rows'))==1 && arrayOfMaterials(2)==7 && sum(ismember(ArrayOfPlanes(6:9),tmp_plane))~=4 && arrayOfMaterials(1)==7 && sum(ismember(ArrayOfPlanes(10:13),tmp_plane))~=4
             [~,idx]= ismember(ArrayOfPlanes(2:5),tmp_plane, 'rows');
-            materialLibrary.refreactiveindex(7)=plane_mat(idx,1);
-            materialLibrary.absortionrate(7)=plane_mat(idx,2);
+            materialLibrary.permittivity(7)=plane_mat(idx,1);
+            materialLibrary.conductivity(7)=plane_mat(idx,2);
             materialLibrary.roughness(7)=plane_mat(idx,3);
-            index=[8,9,10,11,12,13,14,18,19,20,21,22,23,24,25,26];
+            index=[8,9,10,11,12,13,14,18];
             scatterer_index=index(randperm(numel(index),1));
-            scatterer2_ref=materialLibrary.refreactiveindex(scatterer_index);
-            scatterer2_abs=materialLibrary.absortionrate(scatterer_index);
+            scatterer2_per=materialLibrary.permittivity(scatterer_index);
+            scatterer2_con=materialLibrary.conductivity(scatterer_index);
             scatterer2_rou=materialLibrary.roughness(scatterer_index);
             tmp_plane=[tmp_plane;ArrayOfPlanes(6:9)];
-            plane_mat=[plane_mat;scatterer2_ref scatterer2_abs scatterer2_rou];
+            plane_mat=[plane_mat;scatterer2_per scatterer2_con scatterer2_rou];
             scatterer_index=index(randperm(numel(index),1));
-            scatterer3_ref=materialLibrary.refreactiveindex(scatterer_index);
-            scatterer3_abs=materialLibrary.absortionrate(scatterer_index);
+            scatterer3_per=materialLibrary.permittivity(scatterer_index);
+            scatterer3_con=materialLibrary.conductivity(scatterer_index);
             scatterer3_rou=materialLibrary.roughness(scatterer_index);
             tmp_plane=[tmp_plane;ArrayOfPlanes(10:13)];
-            plane_mat=[plane_mat;scatterer3_ref scatterer3_abs scatterer3_rou];
+            plane_mat=[plane_mat;scatterer3_per scatterer3_con scatterer3_rou];
         elseif ~isempty(tmp_plane) && arrayOfMaterials(3)==7 && sum(ismember(ArrayOfPlanes(6:9),tmp_plane,'rows'))==1 && arrayOfMaterials(2)==7 && sum(ismember(ArrayOfPlanes(2:5),tmp_plane))~=4 && arrayOfMaterials(1)==7 && sum(ismember(ArrayOfPlanes(10:13),tmp_plane))~=4
-            index=[8,9,10,11,12,13,14,18,19,20,21,22,23,24,25,26];
+            index=[8,9,10,11,12,13,14,18];
             scatterer_index=index(randperm(numel(index),1));
-            materialLibrary.refreactiveindex(7)=materialLibrary.refreactiveindex(scatterer_index);
-            materialLibrary.absortionrate(7)=materialLibrary.absortionrate(scatterer_index);
+            materialLibrary.permittivity(7)=materialLibrary.permittivity(scatterer_index);
+            materialLibrary.conductivity(7)=materialLibrary.conductivity(scatterer_index);
             materialLibrary.roughness(7)=materialLibrary.roughness(scatterer_index);
             tmp_plane=[tmp_plane;ArrayOfPlanes(2:5)];
-            plane_mat=[plane_mat;materialLibrary.refreactiveindex(7) materialLibrary.absortionrate(7) materialLibrary.roughness(7)];
+            plane_mat=[plane_mat;materialLibrary.permittivity(7) materialLibrary.conductivity(7) materialLibrary.roughness(7)];
             [~,idx]= ismember(ArrayOfPlanes(6:9),tmp_plane, 'rows');
-            scatterer2_ref=plane_mat(idx,1);
-            scatterer2_abs=plane_mat(idx,2);
+            scatterer2_per=plane_mat(idx,1);
+            scatterer2_con=plane_mat(idx,2);
             scatterer2_rou=plane_mat(idx,3);
             scatterer_index=index(randperm(numel(index),1));
-            scatterer3_ref=materialLibrary.refreactiveindex(scatterer_index);
-            scatterer3_abs=materialLibrary.absortionrate(scatterer_index);
+            scatterer3_per=materialLibrary.permittivity(scatterer_index);
+            scatterer3_con=materialLibrary.conductivity(scatterer_index);
             scatterer3_rou=materialLibrary.roughness(scatterer_index);
             tmp_plane=[tmp_plane;ArrayOfPlanes(10:13)];
-            plane_mat=[plane_mat;scatterer3_ref scatterer3_abs scatterer3_rou];
+            plane_mat=[plane_mat;scatterer3_per scatterer3_con scatterer3_rou];
         elseif ~isempty(tmp_plane) && arrayOfMaterials(3)==7 && sum(ismember(ArrayOfPlanes(10:13),tmp_plane,'rows'))==1 && arrayOfMaterials(2)==7 && sum(ismember(ArrayOfPlanes(2:5),tmp_plane))~=4 && arrayOfMaterials(1)==7 && sum(ismember(ArrayOfPlanes(6:9),tmp_plane))~=4
-            index=[8,9,10,11,12,13,14,18,19,20,21,22,23,24,25,26];
+            index=[8,9,10,11,12,13,14,18];
             scatterer_index=index(randperm(numel(index),1));
-            materialLibrary.refreactiveindex(7)=materialLibrary.refreactiveindex(scatterer_index);
-            materialLibrary.absortionrate(7)=materialLibrary.absortionrate(scatterer_index);
+            materialLibrary.permittivity(7)=materialLibrary.permittivity(scatterer_index);
+            materialLibrary.conductivity(7)=materialLibrary.conductivity(scatterer_index);
             materialLibrary.roughness(7)=materialLibrary.roughness(scatterer_index);
             tmp_plane=[tmp_plane;ArrayOfPlanes(2:5)];
-            plane_mat=[plane_mat;materialLibrary.refreactiveindex(7) materialLibrary.absortionrate(7) materialLibrary.roughness(7)];
+            plane_mat=[plane_mat;materialLibrary.permittivity(7) materialLibrary.conductivity(7) materialLibrary.roughness(7)];
             scatterer_index=index(randperm(numel(index),1));
-            scatterer2_ref=materialLibrary.refreactiveindex(scatterer_index);
-            scatterer2_abs=materialLibrary.absortionrate(scatterer_index);
+            scatterer2_per=materialLibrary.permittivity(scatterer_index);
+            scatterer2_con=materialLibrary.conductivity(scatterer_index);
             scatterer2_rou=materialLibrary.roughness(scatterer_index);
             tmp_plane=[tmp_plane;ArrayOfPlanes(6:9)];
-            plane_mat=[plane_mat;scatterer2_ref scatterer2_abs scatterer2_rou];
+            plane_mat=[plane_mat;scatterer2_per scatterer2_con scatterer2_rou];
             [~,idx]= ismember(ArrayOfPlanes(10:13),tmp_plane, 'rows');
-            scatterer3_ref=plane_mat(idx,1);
-            scatterer3_abs=plane_mat(idx,2);
+            scatterer3_per=plane_mat(idx,1);
+            scatterer3_con=plane_mat(idx,2);
             scatterer3_rou=plane_mat(idx,3);
         elseif ~isempty(tmp_plane) && arrayOfMaterials(3)==7 && sum(ismember(ArrayOfPlanes(10:13),tmp_plane))~=4 && arrayOfMaterials(2)==7 && sum(ismember(ArrayOfPlanes(2:5),tmp_plane))~=4 && arrayOfMaterials(1)==7 && sum(ismember(ArrayOfPlanes(6:9),tmp_plane))~=4
-            index=[8,9,10,11,12,13,14,18,19,20,21,22,23,24,25,26];
+            index=[8,9,10,11,12,13,14,18];
             scatterer_index=index(randperm(numel(index),1));
-            materialLibrary.refreactiveindex(7)=materialLibrary.refreactiveindex(scatterer_index);
-            materialLibrary.absortionrate(7)=materialLibrary.absortionrate(scatterer_index);
+            materialLibrary.permittivity(7)=materialLibrary.permittivity(scatterer_index);
+            materialLibrary.conductivity(7)=materialLibrary.conductivity(scatterer_index);
             materialLibrary.roughness(7)=materialLibrary.roughness(scatterer_index);
             tmp_plane=[tmp_plane;ArrayOfPlanes(2:5)];
-            plane_mat=[plane_mat;materialLibrary.refreactiveindex(7) materialLibrary.absortionrate(7) materialLibrary.roughness(7)];
+            plane_mat=[plane_mat;materialLibrary.permittivity(7) materialLibrary.conductivity(7) materialLibrary.roughness(7)];
             scatterer_index=index(randperm(numel(index),1));
-            scatterer2_ref=materialLibrary.refreactiveindex(scatterer_index);
-            scatterer2_abs=materialLibrary.absortionrate(scatterer_index);
+            scatterer2_per=materialLibrary.permittivity(scatterer_index);
+            scatterer2_con=materialLibrary.conductivity(scatterer_index);
             scatterer2_rou=materialLibrary.roughness(scatterer_index);
             tmp_plane=[tmp_plane;ArrayOfPlanes(6:9)];
-            plane_mat=[plane_mat;scatterer2_ref scatterer2_abs scatterer2_rou];
+            plane_mat=[plane_mat;scatterer2_per scatterer2_con scatterer2_rou];
             scatterer_index=index(randperm(numel(index),1));
-            scatterer3_ref=materialLibrary.refreactiveindex(scatterer_index);
-            scatterer3_abs=materialLibrary.absortionrate(scatterer_index);
+            scatterer3_per=materialLibrary.permittivity(scatterer_index);
+            scatterer3_con=materialLibrary.conductivity(scatterer_index);
             scatterer3_rou=materialLibrary.roughness(scatterer_index);
             tmp_plane=[tmp_plane;ArrayOfPlanes(10:13)];
-            plane_mat=[plane_mat;scatterer3_ref scatterer3_abs scatterer3_rou];
+            plane_mat=[plane_mat;scatterer3_per scatterer3_con scatterer3_rou];
         end
     end
 end
@@ -813,47 +813,71 @@ for reflectionOrderIndex = 1:orderReflection
     elseif reflectionOrderIndex == 3
         reflectionMaterialIndex = arrayOfMaterials(1,3);
     end
-    if (reflectionMaterialIndex==7 && (exist('scatterer2_ref','var') || exist('scatterer3_ref','var')) && (reflectionOrderIndex==2 || reflectionOrderIndex==3))
-        if ~(exist('scatterer3_ref','var') && reflectionOrderIndex==3)
-            n=scatterer2_ref;
-            absorption_coeff=scatterer2_abs;
-            a=absorption_coeff*100;
-            roughness=scatterer2_rou;
-            r=roughness*10^(-3);
+    if (reflectionMaterialIndex==7 && (exist('scatterer2_per','var') || exist('scatterer3_per','var')) && (reflectionOrderIndex==2 || reflectionOrderIndex==3))
+        if ~(exist('scatterer3_per','var') && reflectionOrderIndex==3)
+            per = scatterer2_per;
+            con = scatterer2_con;
+            per_img = con / (2 * pi * f * e0);
+            n = sqrt((sqrt(per^2+per_img^2) + per)/2);
+            k = sqrt((sqrt(per^2+per_img^2) - per)/2);
+            a = 4 * pi *f / c * k;
+            % n=scatterer2_per;
+            % absorption_coeff=scatterer2_con;
+            % a=absorption_coeff*100;
+            % roughness=scatterer2_rou;
+            % r=roughness*10^(-3);
             aor = Incident_angle(reflectionOrderIndex);
-            Z=sqrt(u0/(e0*(n^2-(a*c/(4*pi*f))^2-1j*2*n*a*c/(2*pi*f))));
+            %Z=sqrt(u0/(e0*(n^2-(a*c/(4*pi*f))^2-1j*2*n*a*c/(2*pi*f))));
+            Z=sqrt(u0/(e0*(n^2-(a*c/(4*pi*f))^2-1j*2*n*a*c/(4*pi*f))));
             aot = asind(sind(aor)*Z/Z0);
-            rou=exp(-0.5*(4*pi*r*cosd(aor)/lab)^2)*besselj(0,8*(pi*r*cos(aor)/lab)); % Beckmann-Kirchhoff theory in the reflection direction      
+            %rou=exp(-0.5*(4*pi*r*cosd(aor)/lab)^2)*besselj(0,8*(pi*r*cos(aor)/lab)); % Beckmann-Kirchhoff theory in the reflection direction      
+            rou=exp(-0.5*(4*pi*r*cosd(aor)/lab)^2);
             Rou = [Rou,rou];
             reflectionCoefficient(:, reflectionOrderIndex) = rou.*[ ...
             (Z*cosd(aor)-Z0*cosd(aot))/(Z*cosd(aor)+Z0*cosd(aot)); ... % Parallel 
             (Z*cosd(aot)-Z0*cosd(aor))/(Z*cosd(aot)+Z0*cosd(aor))];   % Perpendicular
         else
-            n=scatterer3_ref;
-            absorption_coeff=scatterer3_abs;
-            a=absorption_coeff*100;
-            roughness=scatterer3_rou;
+            per = scatterer3_per;
+            con = scatterer3_con;
+            per_img = con / (2 * pi * f * e0);
+            n = sqrt((sqrt(per^2+per_img^2) + per)/2);
+            k = sqrt((sqrt(per^2+per_img^2) - per)/2);
+            a = 4 * pi *f / c * k;
+            % n=scatterer3_per;
+            % absorption_coeff=scatterer3_con;
+            % a=absorption_coeff*100;
+            % roughness=scatterer3_rou;
             r=roughness*10^(-3);
             aor = Incident_angle(reflectionOrderIndex);
-            Z=sqrt(u0/(e0*(n^2-(a*c/(4*pi*f))^2-1j*2*n*a*c/(2*pi*f))));
+            %Z=sqrt(u0/(e0*(n^2-(a*c/(4*pi*f))^2-1j*2*n*a*c/(2*pi*f))));
+            Z=sqrt(u0/(e0*(n^2-(a*c/(4*pi*f))^2-1j*2*n*a*c/(4*pi*f))));
             aot = asind(sind(aor)*Z/Z0);
-            rou=exp(-0.5*(4*pi*r*cosd(aor)/lab)^2)*besselj(0,8*(pi*r*cos(aor)/lab)); % Beckmann-Kirchhoff theory in the reflection direction      
+            %rou=exp(-0.5*(4*pi*r*cosd(aor)/lab)^2)*besselj(0,8*(pi*r*cos(aor)/lab)); % Beckmann-Kirchhoff theory in the reflection direction      
+            rou=exp(-0.5*(4*pi*r*cosd(aor)/lab)^2);
             Rou = [Rou,rou];
             reflectionCoefficient(:, reflectionOrderIndex) = rou.*[ ...
             (Z*cosd(aor)-Z0*cosd(aot))/(Z*cosd(aor)+Z0*cosd(aot)); ... % Parallel 
             (Z*cosd(aot)-Z0*cosd(aor))/(Z*cosd(aot)+Z0*cosd(aor))];   % Perpendicular
         end
     else
-        refractive_index = materialLibrary.refreactiveindex(reflectionMaterialIndex); 
-        n=refractive_index;
-        absorption_coeff = materialLibrary.absortionrate(reflectionMaterialIndex);
-        a=absorption_coeff*100;
+        per = materialLibrary.permittivity(reflectionMaterialIndex);
+        con = materialLibrary.conductivity(reflectionMaterialIndex);
+        per_img = con / (2 * pi * f * e0);
+        n = sqrt((sqrt(per^2+per_img^2) + per)/2);
+        k = sqrt((sqrt(per^2+per_img^2) - per)/2);
+        a = 4 * pi *f / c * k;
+        % refractive_index = materialLibrary.permittivity(reflectionMaterialIndex); 
+        % n=refractive_index;
+        % absorption_coeff = materialLibrary.conductivity(reflectionMaterialIndex);
+        % a=absorption_coeff*100;
         roughness=materialLibrary.roughness(reflectionMaterialIndex);
         r=roughness*10^(-3);
         aor = Incident_angle(reflectionOrderIndex);
-        Z=sqrt(u0/(e0*(n^2-(a*c/(4*pi*f))^2-1j*2*n*a*c/(2*pi*f))));
+        %Z=sqrt(u0/(e0*(n^2-(a*c/(4*pi*f))^2-1j*2*n*a*c/(2*pi*f))));
+        Z=sqrt(u0/(e0*(n^2-(a*c/(4*pi*f))^2-1j*2*n*a*c/(4*pi*f))));
         aot = asind(sind(aor)*Z/Z0);
-        rou=exp(-0.5*(4*pi*r*cosd(aor)/lab)^2)*besselj(0,8*(pi*r*cos(aor)/lab));
+        %rou=exp(-0.5*(4*pi*r*cosd(aor)/lab)^2)*besselj(0,8*(pi*r*cos(aor)/lab));
+        rou=exp(-0.5*(4*pi*r*cosd(aor)/lab)^2);
         %rou=1;
         Rou = [Rou,rou];
         reflectionCoefficient(:, reflectionOrderIndex) = rou.*[ ...
@@ -861,29 +885,90 @@ for reflectionOrderIndex = 1:orderReflection
         (Z*cosd(aot)-Z0*cosd(aor))/(Z*cosd(aot)+Z0*cosd(aor))];   % Perpendicular
     end
 end
+if orderReflection==1
+    norm1 = ArrayOfPlanes(2:4);%normal vector of the interacted plane, dod the incident vector
+    dod1 = (multipath(1,8:10) - multipath(1,5:7));
+    mynorm = norm1;
+    dod = dod1;
+elseif orderReflection==2
+    norm1 = ArrayOfPlanes(2:4);
+    norm2 = ArrayOfPlanes(6:8);
+    mynorm = [norm1;norm2];
+    dod1 = (multipath(1,11:13) - multipath(1,8:10));
+    dod2 = (multipath(1,8:10) - multipath(1,5:7));
+    dod = [dod1;dod2];
+elseif orderReflection==3
+    norm1 = ArrayOfPlanes(2:4);
+    norm2 = ArrayOfPlanes(6:8);
+    norm3 = ArrayOfPlanes(10:12);
+    mynorm = [norm1;norm2;norm3];
+    dod1 = (multipath(1,14:16) - multipath(1,11:13));
+    dod2 = (multipath(1,11:13) - multipath(1,8:10));
+    dod3 = (multipath(1,8:10) - multipath(1,5:7));
+    dod = [dod1;dod2;dod3];
+end
+inc_plane = [];
+for i = 1:orderReflection
+    inc_plane_tmp = cross(mynorm(i,:),dod(i,:));
+    inc_plane = [inc_plane;inc_plane_tmp];
+end
+R = [];
 if scattering == 0
     %1 - rou
     %rou=exp(-0.5*(4*pi*r*cosd(aor)/lab)^2)*besselj(0,8*(pi*r*cos(aor)/lab));% Beckmann-Kirchhoff theory in the reflection direction
     %scatteringcoefficient = 1 - rou;
-    reflectionCoefficient = prod(sqrt(abs(reflectionCoefficient).^2),2);
-    if strcmp(polarization,'V-V') || strcmp(polarization,'H-H')
-        R = diag(reflectionCoefficient) * Jones;
-        reflectionLoss = sum(R(:));
+    %reflectionCoefficient = prod(sqrt(abs(reflectionCoefficient).^2),2);
+    if strcmp(polarization,'V-V')
+        E_inc = [0,0,1];
+        for i = 1:orderReflection
+            is_perpendicular = norm(cross(E_inc, inc_plane(i,:)));
+            if is_perpendicular < 1e-10
+                R = [R,reflectionCoefficient(2,i)];
+            else
+                R = [R,reflectionCoefficient(1,i)];
+            end
+        end
+        reflectionCoefficient = prod(sqrt(abs(R).^2));
+        %R = diag(reflectionCoefficient) * Jones;
+        %reflectionLoss = sum(R(:));
         %reflectionCoefficient = reflectionCoefficient(1,:);
         %reflectionCoefficient = diag(reflectionCoefficient) * Jones;
         %reflectionLoss = prod(abs(reflectionCoefficient).^2); 
-        reflectionLoss = -20*log10(reflectionLoss);
-
+        reflectionLoss = -20*log10(reflectionCoefficient);
+    if strcmp(polarization,'H-H')
+        % R = diag(reflectionCoefficient) * Jones;
+        % reflectionLoss = sum(R(:));
+        % %reflectionCoefficient = reflectionCoefficient(1,:);
+        % %reflectionCoefficient = diag(reflectionCoefficient) * Jones;
+        % %reflectionLoss = prod(abs(reflectionCoefficient).^2); 
+        % reflectionLoss = -20*log10(reflectionLoss);
+        E_inc1 = [0,1,0];
+        E_inc2 = [1,0,0];
+        for i = 1:orderReflection
+            %is_perpendicular = norm(cross(E_inc, inc_plane(i)));
+            is_parallel1 = abs(dot(E_inc1, inc_plane(i,:)));
+            is_parallel2 = abs(dot(E_inc2, inc_plane(i,:)));
+            if is_parallel1 < 1e-10 || is_parallel2< 1e-10
+                R = [R,reflectionCoefficient(1,i)];
+            else
+                R = [R,reflectionCoefficient(2,i)];
+            end
+        end
+        reflectionCoefficient = prod(sqrt(abs(R).^2));
+        reflectionLoss = -20*log10(reflectionCoefficient);
     elseif strcmp(polarization,'dual')
         %strcmp(polarization,'dual') || strcmp(polarization,'cross')
         %reflectionCoefficient = prod(sqrt(abs(reflectionCoefficient).^2),2);
-        R = diag(reflectionCoefficient) * Jones;
-        reflectionLoss_H = -20*log10(R(1,1));
-        reflectionLoss_V = -20*log10(R(2,2));
-        reflectionLoss = [reflectionLoss_H;reflectionLoss_V];
+        % R = diag(reflectionCoefficient) * Jones;
+        % reflectionLoss_H = -20*log10(R(1,1));
+        % reflectionLoss_V = -20*log10(R(2,2));
+        % reflectionLoss = [reflectionLoss_H;reflectionLoss_V];
+        R = prod(sqrt(abs(reflectionCoefficient).^2),2);
+        reflectionLoss = [-20*log10(R(1));-20*log10(R(2))];
     end
     diffuseLoss = [];
     scatterPaths = [];
+    end
 else
     %rou = exp(-0.5*(4*pi*r*cosd(aor)/lab)^2)*besselj(0,8*(pi*r*cos(aor)/lab));% Beckmann-Kirchhoff theory in the reflection direction
     scatteringcoefficient = 1 - Rou;

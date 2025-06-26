@@ -105,7 +105,7 @@ MaterialLibrary = importMaterialLibrary(paraCfgInput.materialLibraryPath);
     scatterer_confg,paraCfgInput.scatterer_height_max,paraCfgInput.mat_confg,...
     paraCfgInput.antenna,paraCfgInput.Ptx,paraCfgInput.polarization,paraCfgInput.scattering);
 CADop_diffr = generate_edges(CADop);
-
+wedges = get_wedge_information(CADop_diffr, CADop);
 if paraCfgInput.switchSaveVisualizerFiles == 1
     % Save output file with room coordinates for visualization
     if ~isempty(CADop)

@@ -73,36 +73,6 @@ for i = 1:numLines-1
         end
     end
 end
-
-% validEdgesMask = true(numLines, 1);  % Start by assuming all lines are valid edges
-% 
-% for i = 1:numLines
-%     line = CADop_diffr(i,:);
-%     % Find the two points that form the line segment
-%     p1 = line(1:3);  % First point
-%     p2 = line(4:6);  % Second point
-% 
-%     % Check if the points are adjacent in the triangle (from the list of 3 vertices)
-%     % You would need the list of triangles (vertices) to compare
-%     % For simplicity, assume `triangleVertices` contains the list of triangle vertices
-% 
-%     % Example: Assume triangleVertices(i,:) gives the vertices of the i-th triangle
-%     %triangleVertices = [CADop_sca(:, 1:3); CADop_sca(:, 4:6); CADop_sca(:, 7:9)];
-%     triangleVertices = [CADop_sca(:, 1:3) CADop_sca(:, 4:6) CADop_sca(:, 7:9)];
-%     % Extract the points for the current triangle
-%     v1 = triangleVertices(i, 1:3);  % Vertex 1
-%     v2 = triangleVertices(i, 4:6);  % Vertex 2
-%     v3 = triangleVertices(i, 7:9);  % Vertex 3
-% 
-%     % If the edge is not between adjacent vertices, mark it as invalid
-%     if ~ismember(p1, [v1; v2; v3], 'rows') || ~ismember(p2, [v1; v2; v3], 'rows')
-%         validEdgesMask(i) = false;
-%     end
-% end
-
-
-
-% Remove all duplicate lines (and their duplicates)
 CADop_diffr = CADop_diffr(~removeMask & ~zeroCoordMask & ~edgeIndexMask, :);
 
 end
